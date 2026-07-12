@@ -36,7 +36,7 @@ export async function deleteArtist(artistId: number) {
 }
 
 export async function fetchArtists() {
-    const { data, error } = await supabase.from("artist").select("*")
+    const { data, error } = await supabase.from("artist").select("*").limit(10000)
     if (error) {
         throw Error(error?.message);
     }
@@ -61,7 +61,7 @@ export async function fetchArtistsPaginated(page = 1, limit = 50) {
 }
 
 export async function fetchArtistsDropdown() {
-    const { data, error } = await supabase.from("artist").select("name,id")
+    const { data, error } = await supabase.from("artist").select("name,id").limit(10000)
     if (error) {
         throw Error(error?.message);
     }
@@ -86,12 +86,12 @@ export async function updateArtistIsActive(artistId: number, isActive: boolean):
 
 export async function fetchArtistWithSongCount(): Promise<any[] | null> {
     try {
-        const { data: artists, error: artistsError } = await supabase.from("artist").select("*");
+        const { data: artists, error: artistsError } = await supabase.from("artist").select("*").limit(10000);
         if (artistsError) {
             throw new Error(artistsError.message);
         }
 
-        const { data: songs, error: songsError } = await supabase.from("song").select("artistId");
+        const { data: songs, error: songsError } = await supabase.from("song").select("artistId").limit(10000);
         if (songsError) {
             throw new Error(songsError.message);
         }
@@ -122,7 +122,8 @@ export async function fetchActiveArtistsWithSongCount(): Promise<any[] | null> {
         const { data: artists, error: artistsError } = await supabase
             .from("artist")
             .select("*")
-            .eq("isActive", true);
+            .eq("isActive", true)
+            .limit(10000);
         if (artistsError) {
             throw new Error(artistsError.message);
         }
@@ -130,7 +131,8 @@ export async function fetchActiveArtistsWithSongCount(): Promise<any[] | null> {
         const { data: songs, error: songsError } = await supabase
             .from("song")
             .select("artistId")
-            .eq("isActive", true);
+            .eq("isActive", true)
+            .limit(10000);
         if (songsError) {
             throw new Error(songsError.message);
         }

@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { addArtist, deleteArtist, fetchArtists, fetchArtistsDropdown, updateArtist, updateArtistIsActive } from "./api/artist.api";
 
 export const useArtistStore = create((set) => ({
-    renderList: false,
     showModal: false,
     artistsDropdown: [],
     artists: [],
@@ -12,9 +11,6 @@ export const useArtistStore = create((set) => ({
     },
     clearSelectedArtist: () => {
         set({ selectedArtist: null })
-    },
-    handleRenderList: (val: boolean) => {
-        set({ renderList: val });
     },
     handleShow: () => {
         set({ showModal: true });

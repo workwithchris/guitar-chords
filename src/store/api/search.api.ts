@@ -4,6 +4,7 @@ interface Song {
     id: number;
     title: string;
     slug: string;
+    image?: string;
     artist: Artist;
     year?: number;
     writtenBy?: string;
@@ -29,11 +30,14 @@ interface ArtistSearchResult {
 
 type SearchResult = SongSearchResult | ArtistSearchResult;
 
+const SEARCH_RESULT_LIMIT = 50;
+
 async function searchSongs(query: string): Promise<SongSearchResult[]> {
     const { data: songResults, error } = await supabase
         .from("song")
-        .select("title,slug,id, artist(name,isActive,id)")
-        .ilike("title", `%${query}%`);
+        .select("title,slug,id,image, artist(name,isActive,id)")
+        .ilike("title", `%${query}%`)
+        .limit(SEARCH_RESULT_LIMIT);
 
     if (error) {
         throw new Error(error.message);
@@ -46,7 +50,8 @@ async function searchArtists(query: string): Promise<ArtistSearchResult[]> {
     const { data: artistResults, error } = await supabase
         .from("artist")
         .select("*")
-        .ilike("name", `%${query}%`);
+        .ilike("name", `%${query}%`)
+        .limit(SEARCH_RESULT_LIMIT);
 
     if (error) {
         throw new Error(error.message);
@@ -55,11 +60,13 @@ async function searchArtists(query: string): Promise<ArtistSearchResult[]> {
     return artistResults.map((artist: any) => ({ type: 'artist', details: artist }));
 }
 
-async function searchArtistSongs(artistId: number): Promise<SongSearchResult[]> {
+async function searchSongsByArtistIds(artistIds: number[]): Promise<SongSearchResult[]> {
+    if (artistIds.length === 0) return [];
+
     const { data: songs, error } = await supabase
         .from("song")
-        .select("title, slug, writtenBy, year, artist(name,isActive,id)")
-        .eq("artistId", artistId);
+        .select("title, slug, image, writtenBy, year, artist(name,isActive,id)")
+        .in("artistId", artistIds);
 
     if (error) {
         throw new Error(error.message);
@@ -75,17 +82,10 @@ export async function searchSongsAndArtists(query: string): Promise<SearchResult
             searchArtists(query),
         ]);
 
-        const results: SearchResult[] = [...songResults, ...artistResults];
+        const artistIds = artistResults.map((artist) => artist.details.id);
+        const artistSongs = await searchSongsByArtistIds(artistIds);
 
-        // Fetch all songs for matching artists and add them to results
-        for (const artistResult of artistResults) {
-            if (artistResult.type === 'artist') {
-                const artistSongs = await searchArtistSongs(artistResult.details.id);
-                results.push(...artistSongs);
-            }
-        }
-
-        return results;
+        return [...songResults, ...artistResults, ...artistSongs];
     } catch (error: any) {
         throw new Error(`Error searching songs and artists: ${error.message}`);
     }

@@ -26,6 +26,7 @@ const songSchema = z.object({
     slug: z.string().min(1, "Slug is required"),
     content: z.string().optional(),
     videoUrl: z.string().optional(),
+    image: z.string().optional(),
     writtenBy: z.string().optional(),
     artistId: z.string().min(1, "Artist is required"),
     year: z.number().optional(),
@@ -51,6 +52,7 @@ export default function SongForm({ initialData }: { initialData?: any }) {
             slug: initialData?.slug ?? "",
             content: initialData?.content ?? "",
             videoUrl: initialData?.videoUrl ?? "",
+            image: initialData?.image ?? "",
             writtenBy: initialData?.writtenBy ?? "",
             artistId: initialData?.artistId?.toString() ?? "",
             year: initialData?.year ?? new Date().getFullYear(),
@@ -225,6 +227,17 @@ export default function SongForm({ initialData }: { initialData?: any }) {
                         </div>
 
                         <div className="space-y-2 pt-2">
+                            <Label htmlFor="image">Album Art URL</Label>
+                            <Input
+                                id="image"
+                                {...register("image")}
+                                placeholder="https://..."
+                                className="h-11"
+                            />
+                            <p className="text-xs text-neutral-400">URL to album cover image (500x500 recommended)</p>
+                        </div>
+
+                        <div className="space-y-2">
                             <Label htmlFor="videoUrl">Video URL</Label>
                             <Input
                                 id="videoUrl"
@@ -248,7 +261,7 @@ export default function SongForm({ initialData }: { initialData?: any }) {
                                 <p className="text-sm text-neutral-500">Write the full song with chord notations</p>
                             </div>
                         </div>
-                        <TextEditor editorValues={watch("content")} getEditorValues={(val) => setValue("content", val)} />
+                        <TextEditor editorValues={watch("content") ?? ""} getEditorValues={(val) => setValue("content", val)} />
                         <p className="text-xs text-neutral-400">
                             Use square brackets for chords: <code className="rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-neutral-600 dark:text-neutral-400">[G]</code>{' '}
                             <code className="rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-neutral-600 dark:text-neutral-400">[C]</code>{' '}

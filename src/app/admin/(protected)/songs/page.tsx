@@ -1,7 +1,7 @@
 import React from 'react'
 import SongsList from './components/list'
 import { fetchSongs } from '@/store/api/song.api'
-import { Plus } from 'lucide-react'
+import { Plus, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button/button'
 
@@ -18,12 +18,20 @@ export default async function SongsPage() {
                         Manage your songs collection
                     </p>
                 </div>
-                <Link href="/admin/songs/add">
-                    <Button className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        Add Song
-                    </Button>
-                </Link>
+                <div className="flex gap-2">
+                    <Link href="/admin/songs/bulk">
+                        <Button variant="outline" className="gap-2">
+                            <Upload className="h-4 w-4" />
+                            Bulk Import
+                        </Button>
+                    </Link>
+                    <Link href="/admin/songs/add">
+                        <Button className="gap-2">
+                            <Plus className="h-4 w-4" />
+                            Add Song
+                        </Button>
+                    </Link>
+                </div>
             </div>
             <SongsList songs={songs} />
         </div>

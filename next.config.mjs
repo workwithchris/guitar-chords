@@ -2,10 +2,8 @@
 const nextConfig = {
     images: {
         remotePatterns: [
-            { hostname: "otbjwgxsfwclozomqmsg.supabase.co" },
-            { hostname: "printler.com" },
-            { hostname: "encrypted-tbn0.gstatic.com" },
-            { hostname: "noodlerex.com.np" },
+            { hostname: "cdn-images.dzcdn.net" },
+            { hostname: "upload.wikimedia.org" }
         ]
     }
 };

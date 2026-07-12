@@ -4,8 +4,9 @@ import { Badge } from '@/components/ui/badge'
 import { useSongStore } from '@/store/song.store'
 import { useRouter } from 'next/navigation'
 import { Pencil, Trash2, Search, Music } from 'lucide-react'
+import Image from 'next/image'
 import { toast } from '@/components/ui/toast/use-toast'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button/button'
 import { Input } from '@/components/ui/form/input'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -34,6 +35,8 @@ export default function SongsList({ songs }: { songs: any[] }) {
     const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null)
     const [deleting, setDeleting] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const pageSize = 50
 
     React.useEffect(() => {
         if (songs) {
@@ -56,12 +59,19 @@ export default function SongsList({ songs }: { songs: any[] }) {
         }
     }
 
-    const filtered = (data ?? songs).filter((song: any) => {
-        const matchesSearch = song.title?.toLowerCase().includes(search.toLowerCase()) ||
-            song.artist?.name?.toLowerCase().includes(search.toLowerCase())
-        const matchesDifficulty = !difficultyFilter || song.difficulty === difficultyFilter
-        return matchesSearch && matchesDifficulty
-    })
+    const filtered = useMemo(() => {
+        return (data ?? songs).filter((song: any) => {
+            const matchesSearch = song.title?.toLowerCase().includes(search.toLowerCase()) ||
+                song.artist?.name?.toLowerCase().includes(search.toLowerCase())
+            const matchesDifficulty = !difficultyFilter || song.difficulty === difficultyFilter
+            return matchesSearch && matchesDifficulty
+        })
+    }, [data, songs, search, difficultyFilter])
+
+    const totalPages = Math.ceil(filtered.length / pageSize)
+    const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
+
+    React.useEffect(() => { setPage(1) }, [search, difficultyFilter])
 
     const difficulties = ['Beginner', 'Intermediate', 'Advanced']
 
@@ -109,7 +119,10 @@ export default function SongsList({ songs }: { songs: any[] }) {
                                 </Button>
                             ))}
                         </div>
-                        <p className="text-sm text-neutral-500 ml-auto">{filtered.length} song{filtered.length !== 1 ? 's' : ''}</p>
+                        <p className="text-sm text-neutral-500 ml-auto">
+                            {filtered.length} song{filtered.length !== 1 ? 's' : ''}
+                            {totalPages > 1 && ` · Page ${page} of ${totalPages}`}
+                        </p>
                     </div>
                     <Table>
                         <TableHeader>
@@ -142,13 +155,17 @@ export default function SongsList({ songs }: { songs: any[] }) {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filtered.map((song: any) => (
+                                paginated.map((song: any) => (
                                     <TableRow key={song.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                                                    <Music className="h-4 w-4 text-neutral-500" />
-                                                </div>
+                                                {song.image ? (
+                                                    <Image src={song.image} width={36} height={36} alt="" className="rounded-lg object-cover shrink-0" />
+                                                ) : (
+                                                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                                                        <Music className="h-4 w-4 text-neutral-500" />
+                                                    </div>
+                                                )}
                                                 <p className="font-medium">{song.title}</p>
                                             </div>
                                         </TableCell>
@@ -201,6 +218,48 @@ export default function SongsList({ songs }: { songs: any[] }) {
                             )}
                         </TableBody>
                     </Table>
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800 mt-4">
+                            <p className="text-xs text-neutral-500">
+                                Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} of {filtered.length}
+                            </p>
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                >
+                                    Previous
+                                </Button>
+                                {(() => {
+                                    const pages: number[] = []
+                                    const start = Math.max(1, page - 2)
+                                    const end = Math.min(totalPages, start + 4)
+                                    for (let p = start; p <= end; p++) pages.push(p)
+                                    return pages.map(p => (
+                                        <Button
+                                            key={p}
+                                            variant={p === page ? 'default' : 'outline'}
+                                            size="sm"
+                                            onClick={() => setPage(p)}
+                                            className="min-w-[32px]"
+                                        >
+                                            {p}
+                                        </Button>
+                                    ))
+                                })()}
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 

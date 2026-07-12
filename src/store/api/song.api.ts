@@ -5,7 +5,8 @@ export async function fetchSongs() {
         const { data: songs, error: songsError } = await supabase
             .from("song")
             .select("*, artist(name,isActive,id)")
-            .order("createdAt", { ascending: false });
+            .order("createdAt", { ascending: false })
+            .limit(10000);
         if (songsError) {
             throw new Error(songsError.message);
         }
@@ -22,7 +23,8 @@ export async function fetchActiveSongs() {
             .select("*, artist!inner(name,isActive,id)")
             .eq("isActive", true)
             .eq("artist.isActive", true)
-            .order("createdAt", { ascending: false });
+            .order("createdAt", { ascending: false })
+            .limit(10000);
         if (songsError) {
             throw new Error(songsError.message);
         }

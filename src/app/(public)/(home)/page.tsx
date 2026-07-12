@@ -1,10 +1,14 @@
 import React from 'react'
-import { fetchActiveSongs } from '@/store/api/song.api'
+import { fetchActiveSongsServer as fetchActiveSongs } from '@/store/api/song.server'
+import { fetchActiveArtistsWithSongCountServer as fetchActiveArtists } from '@/store/api/song.server'
 import HomeClient from './components/home-client'
 
 export const revalidate = 0
 
 export default async function HomePage() {
-    const songs: any[] = await fetchActiveSongs()
-    return <HomeClient songs={songs} />
+    const [songs, artists] = await Promise.all([
+        fetchActiveSongs().catch(() => []),
+        fetchActiveArtists().catch(() => []),
+    ])
+    return <HomeClient songs={songs ?? []} artists={artists ?? []} />
 }

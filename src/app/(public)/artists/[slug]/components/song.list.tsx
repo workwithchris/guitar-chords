@@ -1,6 +1,7 @@
 import React from 'react'
+import Image from 'next/image'
 import Link from 'next/link';
-import { fetchSongsByArtistSlug } from '@/store/api/artist.api';
+import { fetchSongsByArtistSlugServer as fetchSongsByArtistSlug } from '@/store/api/song.server';
 import { Music } from 'lucide-react';
 
 export default async function ArtistList({ slug }: { slug: string }) {
@@ -24,9 +25,13 @@ export default async function ArtistList({ slug }: { slug: string }) {
                     target="_blank"
                     className="group flex items-start gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all"
                 >
-                    <div className="h-10 w-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
+                    {song.image ? (
+                      <Image src={song.image} width={40} height={40} alt="" className="rounded-lg object-cover shrink-0 mt-0.5" />
+                    ) : (
+                      <div className="h-10 w-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
                         <Music className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                    </div>
+                      </div>
+                    )}
                     <div className="min-w-0 space-y-1">
                         <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 truncate">
                             {song.title}

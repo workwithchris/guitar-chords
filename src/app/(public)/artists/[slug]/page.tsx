@@ -1,6 +1,6 @@
 import React from 'react'
 import SongLists from './components/song.list'
-import { fetchArtistBySlug } from '@/store/api/artist.api'
+import { fetchArtistBySlugServer as fetchArtistBySlug } from '@/store/api/song.server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Music } from 'lucide-react'
@@ -11,10 +11,26 @@ export const revalidate = 0
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params
     try {
-        const data = await fetchArtistBySlug(slug)
+        const artist = await fetchArtistBySlug(slug)
+        const title = `${artist?.name} - Guitar Chords Artist`
+        const description = artist?.bio || `Guitar chords and lyrics for songs by ${artist?.name}.`
         return {
-            title: `${data?.name} - Guitar Chords`,
-            description: `Guitar chords and lyrics for songs by ${data?.name}. Browse the complete collection.`,
+            title,
+            description,
+            openGraph: {
+                title,
+                description,
+                type: 'profile',
+                url: `https://guitarchords.techyatraa.com/artists/${slug}`,
+                siteName: 'Guitar Chords',
+                images: artist?.image ? [{ url: artist.image, width: 800, height: 800 }] : [],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title,
+                description,
+                images: artist?.image ? [artist.image] : [],
+            },
         }
     } catch {
         return { title: 'Artist - Guitar Chords' }
@@ -35,15 +51,15 @@ export default async function ArtistDetail({ params }: { params: Promise<{ slug:
                 Back to artists
             </Link>
 
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-                <div className="shrink-0">
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-10 md:gap-14">
+                <div className="flex justify-center md:justify-start">
                     {data?.image ? (
                         <Image
                             src={data.image}
                             width={200}
                             height={200}
                             alt={data.name}
-                            className="rounded-2xl object-cover shadow-sm"
+                            className="rounded-2xl object-cover shadow-lg ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
                         />
                     ) : (
                         <div className="h-[200px] w-[200px] rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
@@ -51,8 +67,8 @@ export default async function ArtistDetail({ params }: { params: Promise<{ slug:
                         </div>
                     )}
                 </div>
-                <div className="space-y-3 flex-1">
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                <div className="flex flex-col justify-center space-y-3">
+                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 leading-tight">
                         {data?.name}
                     </h1>
                     {data?.bio && (
@@ -66,7 +82,7 @@ export default async function ArtistDetail({ params }: { params: Promise<{ slug:
             <div className="border-t border-neutral-200 dark:border-neutral-800" />
 
             <div>
-                <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 mb-6">
+                <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
                     Songs
                 </h2>
                 <SongLists slug={slug} />

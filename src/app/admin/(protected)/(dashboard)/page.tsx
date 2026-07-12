@@ -4,13 +4,20 @@ import { fetchArtists } from '@/store/api/artist.api'
 import { fetchSongs } from '@/store/api/song.api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { ArrowRight, Music, Users, Album, MicVocal } from 'lucide-react'
+import { ArrowRight, Music, Users, Album, MicVocal, Eye, TrendingUp, Calendar } from 'lucide-react'
+import { getTotalViews, getViewsToday, getViewsThisWeek, getTopSongs } from '@/store/api/analytics.api'
 
 export const revalidate = 0
 
 export default async function AdminDashboard() {
   const artists = await fetchArtists()
   const songs = await fetchSongs()
+  const [totalViews, viewsToday, viewsThisWeek, topSongs] = await Promise.all([
+    getTotalViews(),
+    getViewsToday(),
+    getViewsThisWeek(),
+    getTopSongs(),
+  ])
   const activeSongsCount = songs.filter((s: any) => s.isActive).length
   const activeArtistsCount = artists.filter((a: any) => a.isActive).length
   const genres = [...new Set(songs.map((s: any) => s.genre).filter(Boolean))]
@@ -44,10 +51,28 @@ export default async function AdminDashboard() {
           icon={<Album className="h-5 w-5" />}
         />
         <DashboardCard
-          title="Genres"
-          value={genres.length}
-          subtitle={genres.length > 0 ? genres.slice(0, 3).join(', ') + (genres.length > 3 ? '...' : '') : 'No genres'}
-          icon={<MicVocal className="h-5 w-5" />}
+            title="Genres"
+            value={genres.length}
+            subtitle={genres.length > 0 ? genres.slice(0, 3).join(', ') + (genres.length > 3 ? '...' : '') : 'No genres'}
+            icon={<MicVocal className="h-5 w-5" />}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-4">
+        <DashboardCard
+            title="Total Views"
+            value={totalViews.toLocaleString()}
+            icon={<Eye className="h-5 w-5" />}
+        />
+        <DashboardCard
+            title="Views Today"
+            value={viewsToday.toLocaleString()}
+            icon={<TrendingUp className="h-5 w-5" />}
+        />
+        <DashboardCard
+            title="Views This Week"
+            value={viewsThisWeek.toLocaleString()}
+            icon={<Calendar className="h-5 w-5" />}
         />
       </div>
 
@@ -122,6 +147,28 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {topSongs.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Top Songs (by views)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-3">
+              {topSongs.map((song: any, idx: number) => (
+                <li key={song.id} className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-neutral-400 w-6">{idx + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{song.title}</p>
+                    <p className="text-xs text-neutral-500 truncate">{song.artist?.name}</p>
+                  </div>
+                  <span className="text-xs text-neutral-400">{song.views} views</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

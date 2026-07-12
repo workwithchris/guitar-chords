@@ -13,7 +13,7 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
     return (
         <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
-            <div className="m-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
+            <div className="m-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-10">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div className="flex flex-wrap items-center justify-center gap-6">
                         {footerLinks.map((link) => (

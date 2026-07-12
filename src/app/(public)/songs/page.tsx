@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import SongsList from './components/list'
-import { fetchActiveSongs } from '@/store/api/song.api'
+import { fetchActiveSongsServer as fetchActiveSongs } from '@/store/api/song.server'
 import type { Metadata } from 'next'
 
 export const revalidate = 0
@@ -24,7 +24,9 @@ export default async function SongsPage() {
                 </p>
             </div>
             <div className="border-t border-neutral-200 dark:border-neutral-800" />
-            <SongsList songs={songs} genres={genres} />
+            <Suspense>
+                <SongsList songs={songs} genres={genres} />
+            </Suspense>
         </div>
     )
 }

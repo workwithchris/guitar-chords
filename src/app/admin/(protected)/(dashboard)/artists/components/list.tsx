@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useArtistStore } from '@/store/artist.store'
 import { Pencil, Trash2, Search, Users } from 'lucide-react'
 import { Switch } from '@/components/ui/switch/switch'
@@ -24,6 +24,8 @@ export default function ArtistsList({ artists }: { artists: any[] }) {
     const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
     const [deleting, setDeleting] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const pageSize = 50
 
     useEffect(() => {
         if (artists) {
@@ -46,9 +48,15 @@ export default function ArtistsList({ artists }: { artists: any[] }) {
         }
     }
 
-    const filtered = (data ?? artists).filter((a: any) =>
-        a.name?.toLowerCase().includes(search.toLowerCase())
-    )
+    React.useEffect(() => { setPage(1) }, [search])
+
+    const filtered = useMemo(() =>
+        (data ?? artists).filter((a: any) =>
+            a.name?.toLowerCase().includes(search.toLowerCase())
+        ), [data, artists, search])
+
+    const totalPages = Math.ceil(filtered.length / pageSize)
+    const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
 
     if (loading) {
         return (
@@ -81,7 +89,10 @@ export default function ArtistsList({ artists }: { artists: any[] }) {
                                 className="pl-9"
                             />
                         </div>
-                        <p className="text-sm text-neutral-500">{filtered.length} artist{filtered.length !== 1 ? 's' : ''}</p>
+                        <p className="text-sm text-neutral-500">
+                            {filtered.length} artist{filtered.length !== 1 ? 's' : ''}
+                            {totalPages > 1 && ` · Page ${page} of ${totalPages}`}
+                        </p>
                     </div>
                     <Table>
                         <TableHeader>
@@ -110,7 +121,7 @@ export default function ArtistsList({ artists }: { artists: any[] }) {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filtered.map((artist: any) => (
+                                paginated.map((artist: any) => (
                                     <TableRow key={artist.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
@@ -156,6 +167,48 @@ export default function ArtistsList({ artists }: { artists: any[] }) {
                             )}
                         </TableBody>
                     </Table>
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800 mt-4">
+                            <p className="text-xs text-neutral-500">
+                                Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} of {filtered.length}
+                            </p>
+                            <div className="flex items-center gap-1">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                >
+                                    Previous
+                                </Button>
+                                {(() => {
+                                    const pages: number[] = []
+                                    const start = Math.max(1, page - 2)
+                                    const end = Math.min(totalPages, start + 4)
+                                    for (let p = start; p <= end; p++) pages.push(p)
+                                    return pages.map(p => (
+                                        <Button
+                                            key={p}
+                                            variant={p === page ? 'default' : 'outline'}
+                                            size="sm"
+                                            onClick={() => setPage(p)}
+                                            className="min-w-[32px]"
+                                        >
+                                            {p}
+                                        </Button>
+                                    ))
+                                })()}
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 

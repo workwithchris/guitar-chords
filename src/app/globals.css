@@ -2,34 +2,161 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 9%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 0 0% 83%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
 
 /* width */
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-    /* border-radius: 50% !important; */
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    /* border-radius: 50px !important; */
-    background: #888;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+  width: 6px;
+  height: 6px;
+}
 
-  .song-detail-player iframe {
-    width: 300px !important;
-    height: 300px !important;
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.7);
+}
+
+.song-detail-player iframe {
+  width: 300px !important;
+  height: 300px !important;
+}
+
+.chord-pop {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  padding: 0 1px;
+  border-radius: 4px;
+  background: hsl(var(--secondary));
+  transition: background 120ms ease, color 120ms ease;
+}
+.chord-pop:hover {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.chords-lyrics {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  white-space: pre-wrap;
+  line-height: 1.9;
+}
+.chords-lyrics p {
+  margin-bottom: 0.25rem;
+}
+.chords-lyrics h2,
+.chords-lyrics h3 {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.chords-lyrics .lyric-line {
+  display: block;
+  line-height: 2.4;
+  margin-bottom: 0.1rem;
+}
+.chords-lyrics .seg {
+  display: inline-block;
+  position: relative;
+  vertical-align: bottom;
+  margin-right: 0.2em;
+}
+.chords-lyrics .seg .chord {
+  position: absolute;
+  top: -1.05em;
+  left: 0;
+  font-size: 0.8em;
+  font-weight: 700;
+  color: hsl(var(--primary));
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0 1px;
+}
+.chords-lyrics .seg .lyric {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+.chords-lyrics .lyric-section {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  margin-top: 1.4rem;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.8em;
+  color: hsl(var(--muted-foreground));
+}
+
+.scroll-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 3px;
+  z-index: 60;
+  background: hsl(var(--primary));
+  transition: width 80ms linear;
+}
 
 .dark .ql-toolbar {
   background: #1c1c1e;
@@ -145,6 +272,11 @@
     background: white !important;
     color: black !important;
     font-size: 11pt;
+  }
+  .chord-pop {
+    background: transparent !important;
+    color: black !important;
+    font-weight: 700 !important;
   }
   .song-detail-player {
     page-break-before: always;

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Music, Users, LogOut, Menu } from "lucide-react"
+import { LayoutDashboard, Music, Users, FileText, LogOut, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button/button"
 import { ModeToggle } from "@/components/ui/button/toggle-mode"
 import { useAuthStore } from "@/store/auth.store"
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/songs", label: "Songs", icon: Music },
   { href: "/admin/artists", label: "Artists", icon: Users },
+  { href: "/admin/blog", label: "Blog", icon: FileText },
 ]
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
