@@ -33,31 +33,38 @@ type SearchResult = SongSearchResult | ArtistSearchResult;
 const SEARCH_RESULT_LIMIT = 50;
 
 async function searchSongs(query: string): Promise<SongSearchResult[]> {
-    const { data: songResults, error } = await supabase
-        .from("song")
-        .select("title,slug,id,image, artist(name,isActive,id)")
-        .ilike("title", `%${query}%`)
-        .limit(SEARCH_RESULT_LIMIT);
+    const { data: songResults, error } = await supabase.rpc("search_songs", {
+        search_query: query,
+        result_limit: SEARCH_RESULT_LIMIT,
+    });
 
     if (error) {
         throw new Error(error.message);
     }
 
-    return songResults.map((song: any) => ({ type: 'song', details: song }));
+    return (songResults ?? []).map((row: any) => ({
+        type: 'song',
+        details: {
+            id: row.id,
+            title: row.title,
+            slug: row.slug,
+            image: row.image,
+            artist: { id: row.artist_id, name: row.artist_name, isActive: row.artist_is_active },
+        },
+    }));
 }
 
 async function searchArtists(query: string): Promise<ArtistSearchResult[]> {
-    const { data: artistResults, error } = await supabase
-        .from("artist")
-        .select("*")
-        .ilike("name", `%${query}%`)
-        .limit(SEARCH_RESULT_LIMIT);
+    const { data: artistResults, error } = await supabase.rpc("search_artists", {
+        search_query: query,
+        result_limit: SEARCH_RESULT_LIMIT,
+    });
 
     if (error) {
         throw new Error(error.message);
     }
 
-    return artistResults.map((artist: any) => ({ type: 'artist', details: artist }));
+    return (artistResults ?? []).map((artist: any) => ({ type: 'artist', details: artist }));
 }
 
 async function searchSongsByArtistIds(artistIds: number[]): Promise<SongSearchResult[]> {
@@ -65,7 +72,7 @@ async function searchSongsByArtistIds(artistIds: number[]): Promise<SongSearchRe
 
     const { data: songs, error } = await supabase
         .from("song")
-        .select("title, slug, image, writtenBy, year, artist(name,isActive,id)")
+        .select("id, title, slug, image, writtenBy, year, artist(name,isActive,id)")
         .in("artistId", artistIds);
 
     if (error) {
@@ -85,7 +92,15 @@ export async function searchSongsAndArtists(query: string): Promise<SearchResult
         const artistIds = artistResults.map((artist) => artist.details.id);
         const artistSongs = await searchSongsByArtistIds(artistIds);
 
-        return [...songResults, ...artistResults, ...artistSongs];
+        const seenSongIds = new Set<number>();
+        const songs: SongSearchResult[] = [];
+        for (const song of [...songResults, ...artistSongs]) {
+            if (seenSongIds.has(song.details.id)) continue;
+            seenSongIds.add(song.details.id);
+            songs.push(song);
+        }
+
+        return [...songs, ...artistResults];
     } catch (error: any) {
         throw new Error(`Error searching songs and artists: ${error.message}`);
     }

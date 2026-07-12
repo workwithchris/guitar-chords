@@ -1,5 +1,26 @@
 import supabase from "@/core/supabase/client";
 
+export async function getDashboardStats() {
+    const { data, error } = await supabase.rpc("get_dashboard_stats").single()
+    if (error) {
+        throw new Error(error.message)
+    }
+    const stats = data as {
+        total_songs: number
+        active_songs: number
+        total_artists: number
+        active_artists: number
+        genres: string[] | null
+    }
+    return {
+        totalSongs: stats.total_songs,
+        activeSongs: stats.active_songs,
+        totalArtists: stats.total_artists,
+        activeArtists: stats.active_artists,
+        genres: stats.genres ?? [],
+    }
+}
+
 export async function trackPageView(path: string, songId?: number) {
     try {
         await supabase.from("page_view").insert({

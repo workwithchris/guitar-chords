@@ -60,6 +60,18 @@ export async function fetchArtistsPaginated(page = 1, limit = 50) {
     return { data, count, page, limit, totalPages: Math.ceil((count ?? 0) / limit) }
 }
 
+export async function fetchRecentArtists(limit = 5) {
+    const { data, error } = await supabase
+        .from("artist")
+        .select("id, name, bio")
+        .order("createdAt", { ascending: false })
+        .limit(limit)
+    if (error) {
+        throw Error(error.message)
+    }
+    return data
+}
+
 export async function fetchArtistsDropdown() {
     const { data, error } = await supabase.from("artist").select("name,id").limit(10000)
     if (error) {

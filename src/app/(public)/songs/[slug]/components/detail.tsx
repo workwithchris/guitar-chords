@@ -5,6 +5,7 @@ import { fetchRelatedSongs } from '@/store/api/song.api'
 import {
   Pause, Play, Share2, User, Calendar, PenLine, ArrowLeft,
   Music, ChevronUp, ChevronDown, Heart, Printer, Plus, Minus,
+  PictureInPicture2, Maximize2, Minimize2, X,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -72,6 +73,8 @@ const SongDetail = ({ data }: any) => {
   const [scrollSpeed, setScrollSpeed] = useState(1.5)
   const [fontSize, setFontSize] = useState(15)
   const [related, setRelated] = useState<any[]>([])
+  const [videoFloating, setVideoFloating] = useState(false)
+  const [videoMinimized, setVideoMinimized] = useState(false)
 
   const pathName = usePathname()
   const lyricsRef = useRef<HTMLDivElement>(null)
@@ -254,6 +257,35 @@ const SongDetail = ({ data }: any) => {
     return scale[idx]
   }, [song?.key, effectiveTranspose, useFlats])
 
+  const isYoutubeEmbed = !!song?.videoUrl && (song.videoUrl.includes('youtube.com/embed') || song.videoUrl.includes('youtu.be'))
+  const youtubeSrc = isYoutubeEmbed
+    ? song.videoUrl
+      .replace('youtu.be/', 'youtube.com/embed/')
+      .replace(/youtube\.com\/watch\?v=([A-Za-z0-9_-]+).*/, 'youtube.com/embed/$1')
+    : null
+
+  const renderVideoEmbed = (className: string) =>
+    isYoutubeEmbed ? (
+      <iframe
+        src={youtubeSrc ?? undefined}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className={className}
+      />
+    ) : (
+      <div className={className} dangerouslySetInnerHTML={{ __html: song?.videoUrl ?? '' }} />
+    )
+
+  const VideoDockedPlaceholder = () => (
+    <button
+      onClick={() => setVideoFloating(false)}
+      className="aspect-video w-full rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 flex flex-col items-center justify-center gap-2 text-neutral-400 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors"
+    >
+      <PictureInPicture2 className="h-6 w-6" />
+      <span className="text-xs font-medium">Playing in floating player — click to dock back</span>
+    </button>
+  )
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -284,7 +316,7 @@ const SongDetail = ({ data }: any) => {
         </Link>
       </motion.div>
 
-      <div ref={heroRef} className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-10 md:gap-14">
+      <div ref={heroRef} className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[280px_1fr_400px] gap-10 md:gap-14">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -479,41 +511,84 @@ const SongDetail = ({ data }: any) => {
             )}
           </StaggerRow>
         </div>
+
+        {song?.videoUrl && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className="hidden lg:block no-print"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                  Video
+                </h2>
+                {!videoFloating && (
+                  <button
+                    onClick={() => setVideoFloating(true)}
+                    aria-label="Pop out video"
+                    title="Pop out video"
+                    className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  >
+                    <PictureInPicture2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+              {videoFloating ? (
+                <VideoDockedPlaceholder />
+              ) : (
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-neutral-200/50 dark:ring-neutral-800/50">
+                  {renderVideoEmbed('w-full h-full')}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {song?.videoUrl && (
-        <SectionReveal>
-          <div className="space-y-4 no-print">
-            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-              Video
-            </h2>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="flex justify-center"
-            >
-              {song.videoUrl.includes('youtube.com/embed') || song.videoUrl.includes('youtu.be') ? (
-                <motion.div
-                  whileHover={{ scale: 1.005 }}
-                  className="relative w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
-                >
-                  <iframe
-                    src={song.videoUrl
-                      .replace('youtu.be/', 'youtube.com/embed/')
-                      .replace(/youtube\.com\/watch\?v=([A-Za-z0-9_-]+).*/, 'youtube.com/embed/$1')}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="absolute inset-0 w-full h-full"
-                  />
-                </motion.div>
-              ) : (
-                <div className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-md" dangerouslySetInnerHTML={{ __html: song.videoUrl }} />
-              )}
-            </motion.div>
-          </div>
-        </SectionReveal>
+        <div className="lg:hidden">
+          <SectionReveal>
+            <div className="space-y-4 no-print">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                  Video
+                </h2>
+                {!videoFloating && (
+                  <button
+                    onClick={() => setVideoFloating(true)}
+                    aria-label="Pop out video"
+                    title="Pop out video"
+                    className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  >
+                    <PictureInPicture2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-center"
+              >
+                {videoFloating ? (
+                  <div className="w-full max-w-2xl">
+                    <VideoDockedPlaceholder />
+                  </div>
+                ) : (
+                  <motion.div
+                    whileHover={{ scale: 1.005 }}
+                    className="relative w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                  >
+                    {renderVideoEmbed('absolute inset-0 w-full h-full')}
+                  </motion.div>
+                )}
+              </motion.div>
+            </div>
+          </SectionReveal>
+        </div>
       )}
 
       <SectionReveal>
@@ -717,6 +792,47 @@ const SongDetail = ({ data }: any) => {
           </div>
         </SectionReveal>
       )}
+
+      <AnimatePresence>
+        {videoFloating && song?.videoUrl && (
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.92 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className={`fixed bottom-4 right-4 z-50 no-print rounded-2xl overflow-hidden shadow-2xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50 bg-white dark:bg-neutral-900 ${
+              videoMinimized ? 'w-56' : 'w-[calc(100vw-2rem)] sm:w-96'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2 px-3 py-2 bg-neutral-900 dark:bg-neutral-800">
+              <span className="text-xs font-medium text-neutral-200 truncate">{song?.title}</span>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => setVideoMinimized((v) => !v)}
+                  aria-label={videoMinimized ? 'Expand video' : 'Minimize video'}
+                  title={videoMinimized ? 'Expand' : 'Minimize'}
+                  className="p-1 rounded-md hover:bg-white/10 transition-colors"
+                >
+                  {videoMinimized ? <Maximize2 className="h-3.5 w-3.5 text-neutral-300" /> : <Minimize2 className="h-3.5 w-3.5 text-neutral-300" />}
+                </button>
+                <button
+                  onClick={() => setVideoFloating(false)}
+                  aria-label="Dock video back"
+                  title="Dock back"
+                  className="p-1 rounded-md hover:bg-white/10 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5 text-neutral-300" />
+                </button>
+              </div>
+            </div>
+            {!videoMinimized && (
+              <div className="aspect-video">
+                {renderVideoEmbed('w-full h-full')}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

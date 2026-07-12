@@ -5,7 +5,7 @@ import { fetchSongsByArtistSlugServer as fetchSongsByArtistSlug } from '@/store/
 import { Music } from 'lucide-react';
 
 export default async function ArtistList({ slug }: { slug: string }) {
-    const songs = await fetchSongsByArtistSlug(slug);
+    const songs = (await fetchSongsByArtistSlug(slug)).filter(s => s.isActive);
 
     if (!songs || songs.length === 0) {
         return (

@@ -1,26 +1,25 @@
 import React from 'react'
 import DashboardCard from './components/card'
-import { fetchArtists } from '@/store/api/artist.api'
-import { fetchSongs } from '@/store/api/song.api'
+import { fetchRecentArtists } from '@/store/api/artist.api'
+import { fetchRecentSongs } from '@/store/api/song.api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { ArrowRight, Music, Users, Album, MicVocal, Eye, TrendingUp, Calendar } from 'lucide-react'
-import { getTotalViews, getViewsToday, getViewsThisWeek, getTopSongs } from '@/store/api/analytics.api'
+import { getTotalViews, getViewsToday, getViewsThisWeek, getTopSongs, getDashboardStats } from '@/store/api/analytics.api'
 
 export const revalidate = 0
 
 export default async function AdminDashboard() {
-  const artists = await fetchArtists()
-  const songs = await fetchSongs()
-  const [totalViews, viewsToday, viewsThisWeek, topSongs] = await Promise.all([
+  const [stats, songs, artists, totalViews, viewsToday, viewsThisWeek, topSongs] = await Promise.all([
+    getDashboardStats(),
+    fetchRecentSongs(),
+    fetchRecentArtists(),
     getTotalViews(),
     getViewsToday(),
     getViewsThisWeek(),
     getTopSongs(),
   ])
-  const activeSongsCount = songs.filter((s: any) => s.isActive).length
-  const activeArtistsCount = artists.filter((a: any) => a.isActive).length
-  const genres = [...new Set(songs.map((s: any) => s.genre).filter(Boolean))]
+  const { totalSongs, activeSongs: activeSongsCount, totalArtists, activeArtists: activeArtistsCount, genres } = stats
 
   return (
     <div className="space-y-8">
@@ -34,20 +33,20 @@ export default async function AdminDashboard() {
       <div className="flex flex-wrap gap-4">
         <DashboardCard
           title="Total Songs"
-          value={songs.length}
+          value={totalSongs}
           subtitle={`${activeSongsCount} active`}
           icon={<Music className="h-5 w-5" />}
         />
         <DashboardCard
           title="Total Artists"
-          value={artists.length}
+          value={totalArtists}
           subtitle={`${activeArtistsCount} active`}
           icon={<Users className="h-5 w-5" />}
         />
         <DashboardCard
           title="Active Songs"
           value={activeSongsCount}
-          subtitle={songs.length - activeSongsCount > 0 ? `${songs.length - activeSongsCount} inactive` : 'All active'}
+          subtitle={totalSongs - activeSongsCount > 0 ? `${totalSongs - activeSongsCount} inactive` : 'All active'}
           icon={<Album className="h-5 w-5" />}
         />
         <DashboardCard
@@ -95,7 +94,7 @@ export default async function AdminDashboard() {
               </div>
             ) : (
               <ul className="space-y-3">
-                {songs.slice(0, 5).map((song: any) => (
+                {songs.map((song: any) => (
                   <li key={song.id} className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800 shrink-0">
                       <Music className="h-4 w-4 text-neutral-500" />
@@ -129,7 +128,7 @@ export default async function AdminDashboard() {
               </div>
             ) : (
               <ul className="space-y-3">
-                {artists.slice(0, 5).map((artist: any) => (
+                {artists.map((artist: any) => (
                   <li key={artist.id} className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800 shrink-0 text-sm font-medium text-neutral-600 dark:text-neutral-400">
                       {artist.name?.charAt(0)?.toUpperCase()}

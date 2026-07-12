@@ -34,6 +34,22 @@ export async function fetchActiveSongs() {
     }
 }
 
+export async function fetchRecentSongs(limit = 5) {
+    try {
+        const { data: songs, error } = await supabase
+            .from("song")
+            .select("id, title, artist(name,isActive,id)")
+            .order("createdAt", { ascending: false })
+            .limit(limit)
+        if (error) {
+            throw new Error(error.message)
+        }
+        return songs
+    } catch (error: any) {
+        throw new Error(`Error fetching recent songs: ${error.message}`)
+    }
+}
+
 export async function fetchSongById(songId: number) {
     try {
         const { data: song, error } = await supabase

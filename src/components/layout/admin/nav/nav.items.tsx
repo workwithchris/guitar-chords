@@ -12,6 +12,9 @@ export const NavItems = () => {
             <Link href="/admin/artists">
                 <p className={pathName === "/admin/artists" ? "text-white bg-gray-600 rounded-md px-2 py-1" : "text-gray-600 py-1 dark:hover:bg-gray-800 px-2 rounded-md transition-all"}>Artists</p>
             </Link>
+            <Link href="/admin/blog">
+                <p className={pathName.startsWith("/admin/blog") ? "text-white bg-gray-600 rounded-md px-2 py-1" : "text-gray-600 py-1 dark:hover:bg-gray-800 px-2 rounded-md transition-all"}>Blog</p>
+            </Link>
         </nav>
     </div>
 }
