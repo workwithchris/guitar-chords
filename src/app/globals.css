@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* width */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    /* border-radius: 50% !important; */
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    /* border-radius: 50px !important; */
+    background: #888;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .song-detail-player iframe {
+    width: 300px !important;
+    height: 300px !important;
+  }
+
+.dark .ql-toolbar {
+  background: #1c1c1e;
+  border-color: #27272a;
+  border-radius: 12px 12px 0 0;
+}
+
+.dark .ql-container {
+  border-color: #27272a;
+  border-radius: 0 0 12px 12px;
+}
+
+.dark .ql-editor {
+  color: #e4e4e7;
+  background: #09090b;
+}
+
+.dark .ql-stroke {
+  stroke: #a1a1aa;
+}
+
+.dark .ql-fill {
+  fill: #a1a1aa;
+}
+
+.dark .ql-picker {
+  color: #a1a1aa;
+}
+
+.dark .ql-picker-options {
+  background: #1c1c1e;
+  border-color: #27272a;
+}
+
+.dark .ql-picker-label {
+  color: #a1a1aa;
+  border-color: #27272a;
+}
+
+.dark .ql-picker-item {
+  color: #a1a1aa;
+}
+
+.dark .ql-editor.ql-blank::before {
+  color: #52525b;
+}
+
+.dark .ql-active .ql-stroke {
+  stroke: #e4e4e7;
+}
+
+.dark .ql-toolbar button:hover .ql-stroke,
+.dark .ql-toolbar button:focus .ql-stroke {
+  stroke: #e4e4e7;
+}
+
+.dark .ql-toolbar button:hover,
+.dark .ql-toolbar button:focus {
+  color: #e4e4e7;
+}
+
+.dark .ql-toolbar .ql-picker-label:hover {
+  color: #e4e4e7;
+}
+
+.dark .ql-snow a {
+  color: #60a5fa;
+}
+
+.quill-wrapper {
+  overflow: hidden;
+}
+
+.quill-wrapper .ql-toolbar {
+  border-radius: 12px 12px 0 0;
+}
+
+.quill-wrapper .ql-container {
+  border-radius: 0 0 12px 12px;
+}
+
+.quill-wrapper .ql-editor {
+  min-height: 560px;
+  font-size: 15px;
+  line-height: 1.8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.quill-wrapper .ql-editor p {
+  margin-bottom: 0.25rem;
+}
+
+.quill-wrapper .ql-editor h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.quill-wrapper .ql-editor h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Print-friendly styles */
+@media print {
+  nav, footer, .no-print, button, .share-buttons, .auto-scroll-controls {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+  .song-detail-player {
+    page-break-before: always;
+  }
+  a {
+    color: black !important;
+    text-decoration: none !important;
+  }
+  @page {
+    margin: 1.5cm;
+  }
+}

@@ -1,0 +1,12 @@
+ALTER TABLE song
+    ADD COLUMN IF NOT EXISTS key TEXT,
+    ADD COLUMN IF NOT EXISTS capo INTEGER DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS tuning TEXT DEFAULT 'EADGBE',
+    ADD COLUMN IF NOT EXISTS difficulty TEXT DEFAULT 'Beginner',
+    ADD COLUMN IF NOT EXISTS genre TEXT,
+    ADD COLUMN IF NOT EXISTS "isActive" BOOLEAN DEFAULT TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_song_key ON song(key);
+CREATE INDEX IF NOT EXISTS idx_song_difficulty ON song(difficulty);
+CREATE INDEX IF NOT EXISTS idx_song_genre ON song(genre);
+CREATE INDEX IF NOT EXISTS idx_song_is_active ON song("isActive");

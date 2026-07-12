@@ -1,0 +1,31 @@
+import React from 'react'
+import SongsList from './components/list'
+import { fetchSongs } from '@/store/api/song.api'
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button/button'
+
+export const revalidate = 0
+
+export default async function SongsPage() {
+    const songs: any[] = await fetchSongs()
+    return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Songs</h1>
+                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                        Manage your songs collection
+                    </p>
+                </div>
+                <Link href="/admin/songs/add">
+                    <Button className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        Add Song
+                    </Button>
+                </Link>
+            </div>
+            <SongsList songs={songs} />
+        </div>
+    )
+}
