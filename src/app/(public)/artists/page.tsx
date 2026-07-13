@@ -5,9 +5,17 @@ import type { Metadata } from 'next'
 
 export const revalidate = 300
 
+const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
+
 export const metadata: Metadata = {
-    title: 'All Artists - Guitar Chords',
-    description: 'Browse guitar chords and lyrics by your favorite artists.',
+    title: 'All Artists',
+    description: 'Browse guitar chords and lyrics by your favorite artists. Find songs by artist name, A-Z.',
+    openGraph: {
+        title: 'All Artists - Guitar Chords',
+        description: 'Browse guitar chords and lyrics by your favorite artists. Find songs by artist name.',
+        url: '/artists',
+    },
+    alternates: { canonical: `${baseUrl}/artists` },
 }
 
 export default async function ArtistsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
@@ -22,8 +30,13 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
         data: [], totalCount: 0, page: 1, totalPages: 1,
     }))
 
+    const prevPage = page > 1 ? page - 1 : null
+    const nextPage = page < result.totalPages ? page + 1 : null
+
     return (
         <div className="space-y-8">
+            {prevPage && <link rel="prev" href={`${baseUrl}/artists?page=${prevPage}${letter ? `&letter=${letter}` : ''}${search ? `&q=${search}` : ''}`} />}
+            {nextPage && <link rel="next" href={`${baseUrl}/artists?page=${nextPage}${letter ? `&letter=${letter}` : ''}${search ? `&q=${search}` : ''}`} />}
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
                     All Artists

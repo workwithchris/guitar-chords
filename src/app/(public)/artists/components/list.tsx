@@ -162,33 +162,22 @@ export default function ArtistsList({
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
+                <div className="flex items-center justify-center gap-1.5 pt-2">
                     <button
                         disabled={currentPage <= 1}
                         onClick={() => navigate({ page: String(currentPage - 1) })}
                         className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     >
                         <ChevronLeft className="h-4 w-4" />
-                        Prev
+                        <span className="hidden sm:inline">Prev</span>
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                        <button
-                            key={p}
-                            onClick={() => navigate({ page: String(p) })}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${p === currentPage
-                                ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
-                                : 'border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                                }`}
-                        >
-                            {p}
-                        </button>
-                    ))}
+                    <PaginationNumbers currentPage={currentPage} totalPages={totalPages} onNavigate={(p) => navigate({ page: String(p) })} />
                     <button
                         disabled={currentPage >= totalPages}
                         onClick={() => navigate({ page: String(currentPage + 1) })}
                         className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     >
-                        Next
+                        <span className="hidden sm:inline">Next</span>
                         <ChevronRight className="h-4 w-4" />
                     </button>
                 </div>
@@ -274,5 +263,33 @@ function ArtistCardList({ artist }: { artist: Artist }) {
                 )}
             </div>
         </Link>
+    )
+}
+
+function PaginationNumbers({ currentPage, totalPages, onNavigate }: { currentPage: number; totalPages: number; onNavigate: (page: number) => void }) {
+    const pages: (number | 'ellipsis')[] = []
+    const range = 1
+    pages.push(1)
+    if (currentPage - range > 2) pages.push('ellipsis')
+    for (let i = Math.max(2, currentPage - range); i <= Math.min(totalPages - 1, currentPage + range); i++) {
+        pages.push(i)
+    }
+    if (currentPage + range < totalPages - 1) pages.push('ellipsis')
+    if (totalPages > 1) pages.push(totalPages)
+    return pages.map((p, i) =>
+        p === 'ellipsis' ? (
+            <span key={`e-${i}`} className="px-1.5 text-sm text-neutral-400">...</span>
+        ) : (
+            <button
+                key={p}
+                onClick={() => onNavigate(p)}
+                className={`min-w-[32px] px-2 py-2 rounded-lg text-sm font-medium transition-colors ${p === currentPage
+                    ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
+                    : 'border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+            >
+                {p}
+            </button>
+        )
     )
 }

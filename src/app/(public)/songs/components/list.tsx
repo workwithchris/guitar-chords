@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { Music, Search, X, ArrowUpDown, LayoutGrid, List, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const
+const CHROMATIC_KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 interface Song {
     id: number
@@ -23,26 +24,36 @@ interface Song {
     artist: { name: string; isActive: boolean; id: number }
 }
 
+function isNew(dateStr: string): boolean {
+    return Date.now() - new Date(dateStr).getTime() < 7 * 24 * 60 * 60 * 1000
+}
+
 export default function SongsList({
     songs,
     genres,
+    genreCounts,
     totalCount,
     currentPage,
     totalPages,
     currentDifficulty,
     currentGenre,
+    currentKey,
     currentSort,
     currentSortDir,
+    allKeys,
 }: {
     songs: Song[]
     genres: string[]
+    genreCounts?: Map<string, number>
     totalCount: number
     currentPage: number
     totalPages: number
     currentDifficulty?: string
     currentGenre?: string
+    currentKey?: string
     currentSort: string
     currentSortDir: string
+    allKeys?: string[]
 }) {
     const router = useRouter()
     const pathname = usePathname()
@@ -50,7 +61,7 @@ export default function SongsList({
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [search, setSearch] = useState(searchParams.get('q') ?? '')
 
-    const hasFilters = currentDifficulty || currentGenre || currentSort !== 'createdAt' || currentSortDir !== 'desc'
+    const hasFilters = currentDifficulty || currentGenre || currentKey || currentSort !== 'createdAt' || currentSortDir !== 'desc'
 
     function buildUrl(overrides: Record<string, string | null>) {
         const next = new URLSearchParams()
@@ -58,6 +69,7 @@ export default function SongsList({
         if (q) next.set('q', q)
         if (overrides.difficulty ?? currentDifficulty) next.set('difficulty', overrides.difficulty ?? currentDifficulty!)
         if (overrides.genre ?? currentGenre) next.set('genre', overrides.genre ?? currentGenre!)
+        if (overrides.key ?? currentKey) next.set('key', overrides.key ?? currentKey!)
         if ((overrides.sort ?? currentSort) !== 'createdAt') next.set('sort', overrides.sort ?? currentSort)
         if ((overrides.dir ?? currentSortDir) !== 'desc') next.set('dir', overrides.dir ?? currentSortDir)
         if (overrides.page && overrides.page !== '1') next.set('page', overrides.page)
@@ -136,46 +148,73 @@ export default function SongsList({
             </div>
 
             {/* Filter chips */}
-            <div className="flex flex-wrap items-center gap-2">
-                {DIFFICULTIES.map((d) => (
-                    <button
-                        key={d}
-                        onClick={() => navigate({ difficulty: currentDifficulty === d ? null : d, page: '1' })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${currentDifficulty === d
-                            ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
-                            : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                            }`}
-                    >
-                        {d}
-                    </button>
-                ))}
-                {genres.map((g) => (
-                    <button
-                        key={g}
-                        onClick={() => navigate({ genre: currentGenre === g ? null : g, page: '1' })}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${currentGenre === g
-                            ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
-                            : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                            }`}
-                    >
-                        {g}
-                    </button>
-                ))}
-                {hasFilters && (
-                    <button
-                        onClick={() => {
-                            setSearch('')
-                            router.push(pathname, { scroll: false })
-                        }}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
-                    >
-                        <X className="h-3 w-3" />
-                        Clear
-                    </button>
+            <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    {DIFFICULTIES.map((d) => (
+                        <button
+                            key={d}
+                            onClick={() => navigate({ difficulty: currentDifficulty === d ? null : d, page: '1' })}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${currentDifficulty === d
+                                ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
+                                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                                }`}
+                        >
+                            {d}
+                        </button>
+                    ))}
+                    {genres.map((g) => {
+                        const count = genreCounts?.get(g)
+                        return (
+                            <button
+                                key={g}
+                                onClick={() => navigate({ genre: currentGenre === g ? null : g, page: '1' })}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${currentGenre === g
+                                    ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
+                                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                                    }`}
+                            >
+                                {g}
+                                {count !== undefined && (
+                                    <span className="ml-1.5 opacity-60">({count})</span>
+                                )}
+                            </button>
+                        )
+                    })}
+                </div>
+                {(allKeys ?? CHROMATIC_KEYS).length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[11px] font-medium text-neutral-400 mr-1">Key</span>
+                        {(allKeys ?? CHROMATIC_KEYS).map((k) => (
+                            <button
+                                key={k}
+                                onClick={() => navigate({ key: currentKey === k ? null : k, page: '1' })}
+                                className={`px-2 py-1 rounded text-xs font-mono font-medium transition-colors ${currentKey === k
+                                    ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
+                                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                                    }`}
+                            >
+                                {k}
+                            </button>
+                        ))}
+                    </div>
                 )}
-                <span className="text-xs text-neutral-400 ml-auto">
-                    {totalCount} result{totalCount !== 1 ? 's' : ''}
-                </span>
+                <div className="flex items-center gap-2">
+                    {hasFilters && (
+                        <button
+                            onClick={() => {
+                                setSearch('')
+                                router.push(pathname, { scroll: false })
+                            }}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                        >
+                            <X className="h-3 w-3" />
+                            Clear all filters
+                        </button>
+                    )}
+                    <span className="text-xs text-neutral-400 ml-auto">
+                        {totalCount} result{totalCount !== 1 ? 's' : ''}
+                    </span>
+                </div>
             </div>
 
             {/* Results */}
@@ -207,33 +246,22 @@ export default function SongsList({
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-2">
+                <div className="flex items-center justify-center gap-1.5 pt-2">
                     <button
                         disabled={currentPage <= 1}
                         onClick={() => navigate({ page: String(currentPage - 1) })}
                         className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     >
                         <ChevronLeft className="h-4 w-4" />
-                        Prev
+                        <span className="hidden sm:inline">Prev</span>
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                        <button
-                            key={p}
-                            onClick={() => navigate({ page: String(p) })}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${p === currentPage
-                                ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
-                                : 'border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                                }`}
-                        >
-                            {p}
-                        </button>
-                    ))}
+                    <PaginationNumbers currentPage={currentPage} totalPages={totalPages} onNavigate={(p) => navigate({ page: String(p) })} />
                     <button
                         disabled={currentPage >= totalPages}
                         onClick={() => navigate({ page: String(currentPage + 1) })}
                         className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     >
-                        Next
+                        <span className="hidden sm:inline">Next</span>
                         <ChevronRight className="h-4 w-4" />
                     </button>
                 </div>
@@ -243,12 +271,14 @@ export default function SongsList({
 }
 
 function SongCardGrid({ song }: { song: Song }) {
+    const showNew = isNew(song.createdAt)
+
     return (
         <Link
             href={`/songs/${song.slug}`}
             className="group block rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all overflow-hidden"
         >
-            <div className="aspect-[3/2] bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
+            <div className="relative aspect-[3/2] bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
                 {song.image ? (
                     <Image
                         src={song.image}
@@ -259,6 +289,11 @@ function SongCardGrid({ song }: { song: Song }) {
                     />
                 ) : (
                     <Music className="h-10 w-10 text-neutral-300 dark:text-neutral-600" />
+                )}
+                {showNew && (
+                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-500/90 text-white text-[10px] font-semibold shadow-sm">
+                        New
+                    </span>
                 )}
             </div>
             <div className="p-4 space-y-2">
@@ -296,12 +331,14 @@ function SongCardGrid({ song }: { song: Song }) {
 }
 
 function SongCardList({ song }: { song: Song }) {
+    const showNew = isNew(song.createdAt)
+
     return (
         <Link
             href={`/songs/${song.slug}`}
             className="group flex items-start gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all"
         >
-            <div className="h-12 w-12 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
+            <div className="relative h-12 w-12 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
                 {song.image ? (
                     <Image
                         src={song.image}
@@ -312,6 +349,9 @@ function SongCardList({ song }: { song: Song }) {
                     />
                 ) : (
                     <Music className="h-5 w-5 text-neutral-400 dark:text-neutral-500" />
+                )}
+                {showNew && (
+                    <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-500 shadow-sm" />
                 )}
             </div>
             <div className="min-w-0 flex-1 space-y-1">
@@ -345,5 +385,33 @@ function SongCardList({ song }: { song: Song }) {
                 </div>
             </div>
         </Link>
+    )
+}
+
+function PaginationNumbers({ currentPage, totalPages, onNavigate }: { currentPage: number; totalPages: number; onNavigate: (page: number) => void }) {
+    const pages: (number | 'ellipsis')[] = []
+    const range = 1
+    pages.push(1)
+    if (currentPage - range > 2) pages.push('ellipsis')
+    for (let i = Math.max(2, currentPage - range); i <= Math.min(totalPages - 1, currentPage + range); i++) {
+        pages.push(i)
+    }
+    if (currentPage + range < totalPages - 1) pages.push('ellipsis')
+    if (totalPages > 1) pages.push(totalPages)
+    return pages.map((p, i) =>
+        p === 'ellipsis' ? (
+            <span key={`e-${i}`} className="px-1.5 text-sm text-neutral-400">...</span>
+        ) : (
+            <button
+                key={p}
+                onClick={() => onNavigate(p)}
+                className={`min-w-[32px] px-2 py-2 rounded-lg text-sm font-medium transition-colors ${p === currentPage
+                    ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
+                    : 'border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    }`}
+            >
+                {p}
+            </button>
+        )
     )
 }

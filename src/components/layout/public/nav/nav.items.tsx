@@ -6,6 +6,7 @@ import { Heart } from "lucide-react";
 const links = [
   { href: "/songs", label: "Songs" },
   { href: "/artists", label: "Artists" },
+  { href: "/chords", label: "Chords" },
   { href: "/favorites", label: "Songbook", icon: Heart },
   { href: "/blog", label: "Blog" },
   { href: "/about-us", label: "About" },

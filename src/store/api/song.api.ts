@@ -165,6 +165,22 @@ export async function updateSongIsActive(songId: number, isActive: boolean): Pro
     }
 }
 
+export async function fetchSongsByKey(key: string, excludeId?: number, limit = 4) {
+    try {
+        const { data, error } = await supabase
+            .from("song")
+            .select("id, title, slug, image, difficulty, artist!inner(name,isActive,id)")
+            .eq("key", key)
+            .eq("isActive", true)
+            .eq("artist.isActive", true)
+            .limit(limit)
+        if (error) throw new Error(error.message)
+        return (data ?? []).filter((s: any) => s.id !== excludeId) as any[]
+    } catch (error: any) {
+        throw new Error(`Error fetching songs by key: ${error.message}`)
+    }
+}
+
 export async function fetchRelatedSongs(songId: number, genre?: string, key?: string, artistId?: number, limit = 4) {
     try {
         let query = supabase

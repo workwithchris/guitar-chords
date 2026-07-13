@@ -2,9 +2,17 @@ import React from "react";
 import type { Metadata } from 'next'
 import { Music, Users, BookOpen, Heart } from 'lucide-react'
 
+const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
+
 export const metadata: Metadata = {
-    title: 'About Us - Guitar Chords',
-    description: 'Learn about GuitarChords by Techyatraa — your destination for guitar chords and lyrics.',
+    title: 'About Us',
+    description: 'Learn about GuitarChords by Techyatraa — your destination for free guitar chords and lyrics across all genres.',
+    openGraph: {
+        title: 'About Us - Guitar Chords',
+        description: 'Learn about GuitarChords by Techyatraa — free guitar chords and lyrics.',
+        url: '/about-us',
+    },
+    alternates: { canonical: `${baseUrl}/about-us` },
 }
 
 const features = [

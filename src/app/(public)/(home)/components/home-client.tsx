@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Music, MicVocal, MessageSquare, Search, BarChart3, Sparkles, GraduationCap } from 'lucide-react'
+import { ArrowRight, Music, MicVocal, MessageSquare, Search, BarChart3, Sparkles, GraduationCap, TrendingUp, BookOpen } from 'lucide-react'
 
 const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced']
+const COMMON_KEYS = ['C', 'G', 'D', 'A', 'E', 'Am', 'Em', 'Dm', 'F', 'Bm']
 
 const difficultyIcons: Record<string, typeof GraduationCap> = {
     Beginner: GraduationCap,
@@ -12,17 +13,29 @@ const difficultyIcons: Record<string, typeof GraduationCap> = {
     Advanced: Sparkles,
 }
 
+function isNew(dateStr: string): boolean {
+    return Date.now() - new Date(dateStr).getTime() < 7 * 24 * 60 * 60 * 1000
+}
+
 export default function HomeClient({
     stats,
     recentSongs,
     genres,
     featuredArtist,
+    trendingSongs,
+    keyCounts,
 }: {
     stats: { totalSongs: number; totalArtists: number; totalGenres: number; beginnerCount: number }
     recentSongs: any[]
     genres: string[]
     featuredArtist: any | null
+    trendingSongs: any[]
+    keyCounts: { key: string; count: number }[]
 }) {
+    const popularKeys = keyCounts.length > 0
+        ? keyCounts.slice(0, 10).map(k => k.key)
+        : COMMON_KEYS
+
     return (
         <div className="space-y-20 pb-16">
             <section className="relative pt-8 md:pt-20 pb-12 md:pb-16 text-center space-y-8 overflow-hidden">
@@ -99,7 +112,7 @@ export default function HomeClient({
                     </h2>
                     <p className="text-sm text-neutral-500 dark:text-neutral-400">Everything you need to start playing</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <Link href="/songs" className="group relative flex flex-col items-center gap-3 p-7 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-md transition-all overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-b from-neutral-50 to-transparent dark:from-neutral-800/50 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <div className="relative h-11 w-11 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
@@ -118,6 +131,16 @@ export default function HomeClient({
                         <div className="relative text-center">
                             <h3 className="font-medium text-neutral-900 dark:text-neutral-100">All Artists</h3>
                             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Browse by artist name</p>
+                        </div>
+                    </Link>
+                    <Link href="/chords" className="group relative flex flex-col items-center gap-3 p-7 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-md transition-all overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-b from-neutral-50 to-transparent dark:from-neutral-800/50 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative h-11 w-11 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
+                            <BookOpen className="h-5 w-5 text-neutral-700 dark:text-neutral-300" />
+                        </div>
+                        <div className="relative text-center">
+                            <h3 className="font-medium text-neutral-900 dark:text-neutral-100">Chord Library</h3>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Learn chord shapes & fingerings</p>
                         </div>
                     </Link>
                     <Link href="/request" className="group relative flex flex-col items-center gap-3 p-7 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-md transition-all overflow-hidden">
@@ -147,6 +170,73 @@ export default function HomeClient({
                                 className="px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:shadow-sm transition-all"
                             >
                                 {g}
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            <section className="space-y-6">
+                <div className="space-y-1.5">
+                    <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">Browse by Key</h2>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">Find songs in a specific key</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    {popularKeys.map((k) => (
+                        <Link
+                            key={k}
+                            href={`/songs?key=${encodeURIComponent(k)}`}
+                            className="px-4 py-2 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-sm font-mono font-medium text-neutral-700 dark:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:shadow-sm transition-all"
+                        >
+                            {k}
+                        </Link>
+                    ))}
+                    <Link
+                        href="/songs"
+                        className="px-4 py-2 rounded-full text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                    >
+                        View all keys
+                    </Link>
+                </div>
+            </section>
+
+            {trendingSongs.length > 0 && (
+                <section className="space-y-6">
+                    <div className="flex items-end justify-between gap-4">
+                        <div className="space-y-1.5">
+                            <h2 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                                <TrendingUp className="h-5 w-5 inline mr-1.5 text-neutral-500" />
+                                Trending Now
+                            </h2>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">Most viewed songs this week</p>
+                        </div>
+                        <Link href="/songs" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+                            View all <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {trendingSongs.map((song: any) => (
+                            <Link
+                                key={song.id}
+                                href={`/songs/${song.slug}`}
+                                className="group flex items-center gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-md transition-all"
+                            >
+                                {song.image ? (
+                                    <Image src={song.image} width={44} height={44} alt="" className="rounded-lg object-cover shrink-0" />
+                                ) : (
+                                    <div className="h-11 w-11 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-colors">
+                                        <Music className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                                    </div>
+                                )}
+                                <div className="min-w-0 flex-1">
+                                    <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100 truncate">{song.title}</p>
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{song.artist?.name ?? 'Unknown Artist'}</p>
+                                </div>
+                                {song.difficulty && (
+                                    <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 shrink-0">
+                                        {song.difficulty}
+                                    </span>
+                                )}
                             </Link>
                         ))}
                     </div>
@@ -209,11 +299,18 @@ export default function HomeClient({
                                     <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100 truncate">{song.title}</p>
                                     <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{song.artist?.name ?? 'Unknown Artist'}</p>
                                 </div>
-                                {song.difficulty && (
-                                    <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 shrink-0">
-                                        {song.difficulty}
-                                    </span>
-                                )}
+                                <div className="flex items-center gap-2 shrink-0">
+                                    {isNew(song.createdAt) && (
+                                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                            New
+                                        </span>
+                                    )}
+                                    {song.difficulty && (
+                                        <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 shrink-0">
+                                            {song.difficulty}
+                                        </span>
+                                    )}
+                                </div>
                             </Link>
                         ))}
                     </div>

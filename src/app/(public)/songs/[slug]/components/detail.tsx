@@ -6,7 +6,7 @@ import { fetchRelatedSongs } from '@/store/api/song.api'
 import {
   Pause, Play, Share2, User, Calendar, PenLine, ArrowLeft,
   Music, ChevronUp, ChevronDown, Heart, Printer, Plus, Minus,
-  PictureInPicture2, Maximize2, Minimize2, X,
+  PictureInPicture2, Maximize2, Minimize2, X, Copy,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -64,8 +64,10 @@ const SongDetail = ({ data }: any) => {
   const [scrollSpeed, setScrollSpeed] = useState(1.5)
   const [fontSize, setFontSize] = useState(15)
   const [related, setRelated] = useState<any[]>([])
+  const [sameKeySongs, setSameKeySongs] = useState<any[]>([])
   const [videoFloating, setVideoFloating] = useState(false)
   const [videoMinimized, setVideoMinimized] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const pathName = usePathname()
   const lyricsRef = useRef<HTMLDivElement>(null)
@@ -116,6 +118,11 @@ const SongDetail = ({ data }: any) => {
     fetchRelatedSongs(song.id, song.genre, song.key, song.artistId)
       .then(setRelated)
       .catch(() => {})
+    if (song.key) {
+      import('@/store/api/song.api').then(m =>
+        m.fetchSongsByKey(song.key, song.id).then(setSameKeySongs).catch(() => {})
+      )
+    }
   }, [song])
 
   useEffect(() => {
@@ -194,6 +201,16 @@ const SongDetail = ({ data }: any) => {
 
   const togglePlayback = useCallback(() => setIsPlaying((p) => !p), [])
   const handlePrint = useCallback(() => window.print(), [])
+
+  const handleCopyChords = useCallback(async () => {
+    const text = song?.content ?? ''
+    if (!text) return
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }, [song?.content])
 
   const decreaseFont = useCallback(() => {
     setFontSize((s) => {
@@ -413,6 +430,16 @@ const SongDetail = ({ data }: any) => {
                 className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
               >
                 <Printer className="h-4 w-4" />
+              </motion.button>
+            </motion.div>
+            <motion.div variants={itemVar} className="hidden md:block">
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={handleCopyChords}
+                aria-label="Copy chords"
+                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+              >
+                <Copy className="h-4 w-4" />
               </motion.button>
             </motion.div>
           </StaggerRow>
@@ -709,6 +736,51 @@ const SongDetail = ({ data }: any) => {
           <ChordPopoverContainer containerRef={lyricsRef} capo={concertPitch ? 0 : capo} />
         </div>
       </SectionReveal>
+
+      {sameKeySongs.length > 0 && (
+        <SectionReveal>
+          <div className="space-y-4">
+            <div className="border-t border-neutral-200 dark:border-neutral-800" />
+            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+              More in {song?.key}
+            </h2>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              {sameKeySongs.map((r: any) => (
+                <motion.div
+                  key={r.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                >
+                  <Link
+                    href={`/songs/${r.slug}`}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all group"
+                  >
+                    {r.image ? (
+                      <Image src={r.image} width={36} height={36} alt="" className="rounded-lg object-cover shrink-0" />
+                    ) : (
+                      <div className="h-9 w-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                        <Music className="h-4 w-4 text-neutral-500" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">{r.title}</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{r.artist?.name}</p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </SectionReveal>
+      )}
 
       {related.length > 0 && (
         <SectionReveal>

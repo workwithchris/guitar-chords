@@ -7,9 +7,17 @@ import type { Metadata } from 'next'
 
 export const revalidate = 300
 
+const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
+
 export const metadata: Metadata = {
-  title: 'Blog & Lessons - Guitar Chords',
-  description: 'Guitar tutorials, chord theory, and lessons to improve your playing.',
+  title: 'Blog & Lessons',
+  description: 'Guitar tutorials, chord theory, and lessons to improve your playing. Tips for beginners and advanced players.',
+  openGraph: {
+    title: 'Blog & Lessons - Guitar Chords',
+    description: 'Guitar tutorials, chord theory, and lessons to improve your playing.',
+    url: '/blog',
+  },
+  alternates: { canonical: `${baseUrl}/blog` },
 }
 
 export default async function BlogPage() {
