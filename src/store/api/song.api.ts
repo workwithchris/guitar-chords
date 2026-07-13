@@ -140,6 +140,16 @@ export async function deleteSong(songId: number) {
         .eq("id", songId)
 }
 
+export async function bulkUpdateSongs(ids: number[], updates: any) {
+    const { error } = await supabase.from("song").update(updates).in("id", ids)
+    if (error) throw new Error(error.message)
+}
+
+export async function bulkDeleteSongs(ids: number[]) {
+    const { error } = await supabase.from("song").delete().in("id", ids)
+    if (error) throw new Error(error.message)
+}
+
 export async function updateSongIsActive(songId: number, isActive: boolean): Promise<boolean> {
     try {
         const { error } = await supabase

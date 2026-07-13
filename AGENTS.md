@@ -107,6 +107,12 @@ Admin pages use `fetchSongs()` / `fetchArtists()` — all records.
 | add shadcn/ui component | `npx shadcn-ui@latest add <name>` |
 | Next.js upgrade codemod | `npx @next/codemod@latest next-16` |
 
+## Scale plan
+
+`docs/SCALE-PLAN.md` — phased performance & UX plan for 1000s of songs/artists.
+Start with Phase 0 (DB indexes in a new migration), then Phase 1 (home page
+lightweight RPCs), etc.
+
 ## Project Skills
 
 Skills defined in `.opencode/skills/<name>/SKILL.md`. Restart opencode after editing.

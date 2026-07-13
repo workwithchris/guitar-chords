@@ -80,6 +80,16 @@ export async function fetchArtistsDropdown() {
     return data.map((i) => { return { label: i.name, value: i.id } });
 }
 
+export async function bulkUpdateArtists(ids: number[], updates: any) {
+    const { error } = await supabase.from("artist").update(updates).in("id", ids)
+    if (error) throw new Error(error.message)
+}
+
+export async function bulkDeleteArtists(ids: number[]) {
+    const { error } = await supabase.from("artist").delete().in("id", ids)
+    if (error) throw new Error(error.message)
+}
+
 export async function updateArtistIsActive(artistId: number, isActive: boolean): Promise<boolean> {
     try {
         const { error } = await supabase
@@ -131,40 +141,12 @@ export async function fetchArtistWithSongCount(): Promise<any[] | null> {
 
 export async function fetchActiveArtistsWithSongCount(): Promise<any[] | null> {
     try {
-        const { data: artists, error: artistsError } = await supabase
-            .from("artist")
+        const { data: artists, error } = await supabase
+            .from("artist_with_song_count")
             .select("*")
-            .eq("isActive", true)
-            .limit(10000);
-        if (artistsError) {
-            throw new Error(artistsError.message);
-        }
-
-        const { data: songs, error: songsError } = await supabase
-            .from("song")
-            .select("artistId")
-            .eq("isActive", true)
-            .limit(10000);
-        if (songsError) {
-            throw new Error(songsError.message);
-        }
-
-        const songCountMap: { [artistId: number]: number } = {};
-        songs.forEach((song) => {
-            const artistId = song.artistId;
-            if (artistId in songCountMap) {
-                songCountMap[artistId]++;
-            } else {
-                songCountMap[artistId] = 1;
-            }
-        });
-
-        const artistsWithSongCount: any[] = artists.map((artist) => ({
-            ...artist,
-            songCount: songCountMap[artist.id] || 0,
-        }));
-
-        return artistsWithSongCount;
+            .eq("isActive", true);
+        if (error) throw new Error(error.message);
+        return artists;
     } catch (error: any) {
         throw new Error(`Error fetching active artists with song count: ${error.message}`);
     }

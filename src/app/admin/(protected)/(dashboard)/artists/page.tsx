@@ -1,12 +1,19 @@
 import React from 'react'
 import ArtistsList from './components/list';
-import { fetchArtists } from '@/store/api/artist.api';
+import { searchArtistsAdmin } from '@/store/api/song.server';
 import AddArtist from './components/add.drawer';
 
 export const revalidate = 0;
 
-export default async function ArtistsPage() {
-    const data: any[] = await fetchArtists();
+export default async function ArtistsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
+    const sp = await searchParams
+    const page = parseInt(sp.page ?? '1', 10)
+    const search = sp.q || undefined
+
+    const result = await searchArtistsAdmin({ search, page }).catch(() => ({
+        artists: [], totalCount: 0, page: 1, totalPages: 1,
+    }))
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -18,7 +25,13 @@ export default async function ArtistsPage() {
                 </div>
                 <AddArtist />
             </div>
-            <ArtistsList artists={data ?? []} />
+            <ArtistsList
+                artists={result.artists}
+                totalCount={result.totalCount}
+                currentPage={result.page}
+                totalPages={result.totalPages}
+                currentSearch={search}
+            />
         </div>
     )
 }

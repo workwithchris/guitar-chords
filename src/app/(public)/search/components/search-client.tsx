@@ -41,8 +41,7 @@ export default function SearchClient({
   suggestions: { slug: string; title: string; artistName?: string; image?: string }[]
 }) {
   const [tab, setTab] = useState<Tab>('all')
-  const [local, setLocal] = useState(query)
-  useDeferredValue(local)
+  const deferredQuery = useDeferredValue(query)
 
   const songs = results.filter((r) => r.type === 'song') as { type: 'song'; details: Song }[]
   const artists = results.filter((r) => r.type === 'artist') as { type: 'artist'; details: Artist }[]
@@ -148,7 +147,7 @@ export default function SearchClient({
                   )}
                   <div className="min-w-0">
                     <h2 className="font-semibold text-neutral-900 dark:text-neutral-100 truncate">
-                      <Highlight text={a.name} query={query} />
+                      <Highlight text={a.name} query={deferredQuery} />
                     </h2>
                     <span className="inline-flex items-center gap-1 mt-0.5 text-xs text-neutral-400 dark:text-neutral-500">
                       <MicVocal className="h-3 w-3" /> Artist
@@ -173,11 +172,11 @@ export default function SearchClient({
                 )}
                 <div className="min-w-0 flex-1">
                   <h2 className="font-semibold text-neutral-900 dark:text-neutral-100 truncate">
-                    <Highlight text={s.title} query={query} />
+                    <Highlight text={s.title} query={deferredQuery} />
                   </h2>
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
-                      {s.artist?.name ? <Highlight text={s.artist.name} query={query} /> : 'Unknown artist'}
+                      {s.artist?.name ? <Highlight text={s.artist.name} query={deferredQuery} /> : 'Unknown artist'}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs text-neutral-400 dark:text-neutral-500">
                       <Music className="h-3 w-3" /> Song

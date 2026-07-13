@@ -12,12 +12,17 @@ const difficultyIcons: Record<string, typeof GraduationCap> = {
     Advanced: Sparkles,
 }
 
-export default function HomeClient({ songs, artists }: { songs: any[]; artists: any[] }) {
-    const recentSongs = songs?.slice(0, 6) ?? []
-    const genres = [...new Set(songs.map((s) => s.genre).filter(Boolean))] as string[]
-    const featuredArtist = [...(artists ?? [])]
-        .sort((a: any, b: any) => (b.songCount ?? 0) - (a.songCount ?? 0))[0] as any | undefined
-
+export default function HomeClient({
+    stats,
+    recentSongs,
+    genres,
+    featuredArtist,
+}: {
+    stats: { totalSongs: number; totalArtists: number; totalGenres: number; beginnerCount: number }
+    recentSongs: any[]
+    genres: string[]
+    featuredArtist: any | null
+}) {
     return (
         <div className="space-y-20 pb-16">
             <section className="relative pt-8 md:pt-20 pb-12 md:pb-16 text-center space-y-8 overflow-hidden">
@@ -65,29 +70,27 @@ export default function HomeClient({ songs, artists }: { songs: any[]; artists: 
                 </Link>
             </section>
 
-            {songs.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {[
-                        { label: 'Songs', value: songs.length, icon: Music },
-                        { label: 'Artists', value: artists?.length ?? 0, icon: MicVocal },
-                        { label: 'Genres', value: genres.length, icon: BarChart3 },
-                        { label: 'Beginner Friendly', value: songs.filter((s: any) => s.difficulty === 'Beginner').length, icon: GraduationCap },
-                    ].map((stat) => {
-                        const Icon = stat.icon
-                        return (
-                            <div key={stat.label} className="flex items-center gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
-                                <div className="h-9 w-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                                    <Icon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
-                                </div>
-                                <div>
-                                    <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{stat.value}</p>
-                                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400">{stat.label}</p>
-                                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                    { label: 'Songs', value: stats.totalSongs, icon: Music },
+                    { label: 'Artists', value: stats.totalArtists, icon: MicVocal },
+                    { label: 'Genres', value: stats.totalGenres, icon: BarChart3 },
+                    { label: 'Beginner Friendly', value: stats.beginnerCount, icon: GraduationCap },
+                ].map((stat) => {
+                    const Icon = stat.icon
+                    return (
+                        <div key={stat.label} className="flex items-center gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+                            <div className="h-9 w-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                                <Icon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                             </div>
-                        )
-                    })}
-                </div>
-            )}
+                            <div>
+                                <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{stat.value}</p>
+                                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">{stat.label}</p>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
 
             <section className="space-y-6">
                 <div className="space-y-1.5">
@@ -158,7 +161,6 @@ export default function HomeClient({ songs, artists }: { songs: any[]; artists: 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {DIFFICULTIES.map((d) => {
                         const Icon = difficultyIcons[d]
-                        const count = songs.filter((s: any) => s.difficulty === d).length
                         return (
                             <Link
                                 key={d}
@@ -170,9 +172,6 @@ export default function HomeClient({ songs, artists }: { songs: any[]; artists: 
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <span className="font-medium text-neutral-900 dark:text-neutral-100">{d}</span>
-                                    {count > 0 && (
-                                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">{count} songs</p>
-                                    )}
                                 </div>
                                 <ArrowRight className="h-4 w-4 text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-100 group-hover:translate-x-0.5 transition-all shrink-0" />
                             </Link>

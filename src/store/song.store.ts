@@ -11,27 +11,17 @@ export const useSongStore = create((set) => ({
     },
     add: async (song: any) => {
         const { error } = await addSong(song);
-        if (error) {
-            throw new Error(error.message)
-        }
-        set({ songs: await fetchSongs() ?? [] });
+        if (error) throw new Error(error.message)
     },
     update: async (songId: number, song: any) => {
         const { error } = await updateSong(songId, song);
-        if (error) {
-            throw new Error(error.message)
-        }
-        set({ songs: await fetchSongs() ?? [] });
+        if (error) throw new Error(error.message)
     },
     delete: async (songId: number) => {
         const { error } = await deleteSong(songId);
-        if (error) {
-            throw new Error(error.message)
-        }
-        set({ songs: await fetchSongs() ?? [] });
+        if (error) throw new Error(error.message)
     },
     updateActiveToggle: async (songId: number, isActive: boolean) => {
         await updateSongIsActive(songId, isActive);
-        set({ songs: await fetchSongs() ?? [] });
     },
 }));
