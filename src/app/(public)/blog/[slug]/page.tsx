@@ -1,11 +1,12 @@
 import React from 'react'
 import Link from 'next/link'
-import { fetchBlogPostBySlug } from '@/store/api/blog.api'
+import Image from 'next/image'
+import { fetchBlogPostBySlug } from '@/store/api/blog.server'
 import { ArrowLeft, Calendar, User } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-export const revalidate = 0
+export const revalidate = 300
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     try {
@@ -80,8 +81,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
 
             {post.image && (
-                <div className="rounded-xl overflow-hidden">
-                    <img src={post.image} alt={post.title} className="w-full object-cover" />
+                <div className="rounded-xl overflow-hidden relative aspect-video">
+                    <Image src={post.image} alt={post.title} fill className="object-cover" />
                 </div>
             )}
 

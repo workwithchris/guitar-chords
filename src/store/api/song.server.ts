@@ -1,6 +1,8 @@
+import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
 import { createServerClient } from "@/core/supabase/server"
 
-export async function fetchActiveSongsServer(): Promise<any[]> {
+async function _fetchActiveSongs(): Promise<any[]> {
     const supabase = createServerClient()
     const { data: songs, error }: any = await supabase
         .from("song")
@@ -8,12 +10,30 @@ export async function fetchActiveSongsServer(): Promise<any[]> {
         .eq("isActive", true)
         .eq("artist.isActive", true)
         .order("createdAt", { ascending: false })
-        .limit(10000)
+        .limit(100)
     if (error) throw new Error(error.message)
     return songs ?? []
 }
 
-export async function fetchSongBySlugServer(slug: string): Promise<{ song: any; artist: any }> {
+export const fetchActiveSongsServer = cache(unstable_cache(_fetchActiveSongs, ['songs-active'], { revalidate: 60 }))
+
+async function _fetchActiveArtistsWithSongCount(): Promise<any[]> {
+    const supabase = createServerClient()
+    const { data: artists, error }: any = await supabase
+        .from("artist")
+        .select("*, song: song(count)")
+        .eq("isActive", true)
+    if (error) throw new Error(error.message)
+    return (artists ?? []).map((a: any) => ({
+        ...a,
+        songCount: a.song?.[0]?.count ?? 0,
+        song: undefined,
+    }))
+}
+
+export const fetchActiveArtistsWithSongCountServer = cache(unstable_cache(_fetchActiveArtistsWithSongCount, ['artists-active-count'], { revalidate: 300 }))
+
+async function _fetchSongBySlug(slug: string): Promise<{ song: any; artist: any }> {
     const supabase = createServerClient()
     const { data: song, error }: any = await supabase
         .from("song")
@@ -32,28 +52,16 @@ export async function fetchSongBySlugServer(slug: string): Promise<{ song: any; 
     return { song, artist }
 }
 
-export async function fetchActiveArtistsWithSongCountServer(): Promise<any[]> {
-    const supabase = createServerClient()
-    const { data: artists, error }: any = await supabase
-        .from("artist")
-        .select("*")
-        .eq("isActive", true)
-        .limit(10000)
-    if (error) throw new Error(error.message)
+export const fetchSongBySlugServer = cache(async (slug: string) => {
+    const getCached = unstable_cache(
+        () => _fetchSongBySlug(slug),
+        [`song-by-slug-${slug}`],
+        { revalidate: 60 }
+    )
+    return getCached()
+})
 
-    const { data: songs }: any = await supabase
-        .from("song")
-        .select("artistId")
-        .eq("isActive", true)
-        .limit(10000)
-
-    const countMap: Record<number, number> = {}
-    songs?.forEach((s: any) => { countMap[s.artistId] = (countMap[s.artistId] || 0) + 1 })
-
-    return (artists ?? []).map((a: any) => ({ ...a, songCount: countMap[a.id] || 0 }))
-}
-
-export async function fetchArtistBySlugServer(slug: string): Promise<any> {
+async function _fetchArtistBySlug(slug: string): Promise<any> {
     const supabase = createServerClient()
     const { data, error }: any = await supabase
         .from("artist")
@@ -64,7 +72,16 @@ export async function fetchArtistBySlugServer(slug: string): Promise<any> {
     return data
 }
 
-export async function fetchSongsByArtistSlugServer(slug: string): Promise<any[]> {
+export const fetchArtistBySlugServer = cache(async (slug: string) => {
+    const getCached = unstable_cache(
+        () => _fetchArtistBySlug(slug),
+        [`artist-by-slug-${slug}`],
+        { revalidate: 60 }
+    )
+    return getCached()
+})
+
+async function _fetchSongsByArtistSlug(slug: string): Promise<any[]> {
     const supabase = createServerClient()
     const { data: artist }: any = await supabase
         .from("artist")
@@ -79,3 +96,12 @@ export async function fetchSongsByArtistSlugServer(slug: string): Promise<any[]>
         .eq("artistId", artist.id)
     return songs ?? []
 }
+
+export const fetchSongsByArtistSlugServer = cache(async (slug: string) => {
+    const getCached = unstable_cache(
+        () => _fetchSongsByArtistSlug(slug),
+        [`songs-by-artist-slug-${slug}`],
+        { revalidate: 60 }
+    )
+    return getCached()
+})

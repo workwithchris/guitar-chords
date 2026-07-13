@@ -1,9 +1,14 @@
 import React from 'react'
-import { fetchSongBySlugServer as fetchSongBySlug } from '@/store/api/song.server'
+import { fetchActiveSongsServer as fetchActiveSongs, fetchSongBySlugServer as fetchSongBySlug } from '@/store/api/song.server'
 import SongDetail from './components/detail'
 import type { Metadata } from 'next'
 
-export const revalidate = 0
+export const revalidate = 60
+
+export async function generateStaticParams() {
+    const songs = await fetchActiveSongs()
+    return songs.map((song: any) => ({ slug: song.slug }))
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params

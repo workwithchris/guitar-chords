@@ -1,12 +1,17 @@
 import React from 'react'
 import SongLists from './components/song.list'
-import { fetchArtistBySlugServer as fetchArtistBySlug } from '@/store/api/song.server'
+import { fetchActiveArtistsWithSongCountServer as fetchActiveArtists, fetchArtistBySlugServer as fetchArtistBySlug } from '@/store/api/song.server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Music } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const revalidate = 0
+export const revalidate = 60
+
+export async function generateStaticParams() {
+    const artists = await fetchActiveArtists()
+    return artists.map((artist: any) => ({ slug: artist.slug }))
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params

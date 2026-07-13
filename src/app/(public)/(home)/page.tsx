@@ -3,7 +3,7 @@ import { fetchActiveSongsServer as fetchActiveSongs } from '@/store/api/song.ser
 import { fetchActiveArtistsWithSongCountServer as fetchActiveArtists } from '@/store/api/song.server'
 import HomeClient from './components/home-client'
 
-export const revalidate = 0
+export const revalidate = 60
 
 export default async function HomePage() {
     const [songs, artists] = await Promise.all([

@@ -1,10 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
-import { fetchPublishedPosts } from '@/store/api/blog.api'
+import Image from 'next/image'
+import { fetchPublishedPosts } from '@/store/api/blog.server'
 import { Calendar, ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const revalidate = 0
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Blog & Lessons - Guitar Chords',
@@ -37,11 +38,13 @@ export default async function BlogPage() {
                             className="group flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all overflow-hidden"
                         >
                             {post.image && (
-                                <div className="aspect-video bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
-                                    <img
+                                <div className="aspect-video bg-neutral-100 dark:bg-neutral-800 overflow-hidden relative">
+                                    <Image
                                         src={post.image}
                                         alt={post.title}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
                             )}

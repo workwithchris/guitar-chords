@@ -3,7 +3,7 @@ import SongsList from './components/list'
 import { fetchActiveSongsServer as fetchActiveSongs } from '@/store/api/song.server'
 import type { Metadata } from 'next'
 
-export const revalidate = 0
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'All Songs - Guitar Chords',

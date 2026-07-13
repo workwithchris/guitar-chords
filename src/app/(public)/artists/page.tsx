@@ -3,7 +3,7 @@ import { fetchActiveArtistsWithSongCountServer as fetchActiveArtistsWithSongCoun
 import ArtistsList from "./components/list"
 import type { Metadata } from 'next'
 
-export const revalidate = 0
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'All Artists - Guitar Chords',

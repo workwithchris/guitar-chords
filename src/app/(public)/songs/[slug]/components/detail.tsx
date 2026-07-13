@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { fetchRelatedSongs } from '@/store/api/song.api'
 import {
   Pause, Play, Share2, User, Calendar, PenLine, ArrowLeft,
@@ -11,24 +12,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 import { useFavorites } from '@/lib/use-favorites'
 import { trackPageView } from '@/store/api/analytics.api'
-import { ChordDiagramList } from '@/components/ui/chord-diagram'
-import ChordPopoverContainer from '@/components/ui/chord-popover'
 import { preferFlatsForKey, transposeChordToken, wrapChords, extractChordsFromHtml } from '@/lib/chords'
 import ChordSheetRenderer, { hasHtmlTags, parseChordSheet } from '@/components/chord-sheet-renderer'
-import {
-  EmailIcon, EmailShareButton, FacebookIcon, FacebookShareButton,
-  LinkedinIcon, LinkedinShareButton, RedditIcon, RedditShareButton,
-  TelegramIcon, TelegramShareButton, TwitterIcon, TwitterShareButton,
-  WhatsappIcon, WhatsappShareButton,
-} from 'react-share'
 
-const iconStyle = { borderRadius: '50%', height: 36, width: 36 }
+const ShareButtons = dynamic(() => import('./share-buttons'), { ssr: false })
+const ChordDiagramList = dynamic(() => import('@/components/ui/chord-diagram').then(m => ({ default: m.ChordDiagramList })), { ssr: false })
+const ChordPopoverContainer = dynamic(() => import('@/components/ui/chord-popover'), { ssr: false })
 const FONT_SIZES = [13, 15, 17, 19, 22]
 const SPEED_OPTIONS = [0.8, 1.5, 3, 5]
 
@@ -81,38 +72,17 @@ const SongDetail = ({ data }: any) => {
   const progressRef = useRef<HTMLDivElement>(null)
   const manualScrollRef = useRef(false)
   const isAutoScrollingRef = useRef(false)
-  const manualScrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
-  const heroRef = useRef<HTMLDivElement>(null)
+    const manualScrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const heroRef = useRef<HTMLDivElement>(null)
 
-  const song = data?.song
-  const artist = data?.artist
-  const capo = Number(song?.capo ?? 0)
+    const song = data?.song
+    const artist = data?.artist
+    const capo = Number(song?.capo ?? 0)
 
-  const { isFavorite, toggleFavorite } = useFavorites()
-  const fav = song ? isFavorite(song.id) : false
+    const { isFavorite, toggleFavorite } = useFavorites()
+    const fav = song ? isFavorite(song.id) : false
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      sectionRefs.current.forEach((el) => {
-        if (!el) return
-        gsap.fromTo(el,
-          { autoAlpha: 0, y: 24 },
-          {
-            autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out',
-            scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
-          }
-        )
-      })
-    })
-
-    return () => {
-      ctx.revert()
-      ScrollTrigger.getAll().forEach((st) => st.kill())
-    }
-  }, [])
-
-  useEffect(() => {
+    useEffect(() => {
     if (song) {
       const key = song.key as string | undefined
       if (key) setUseFlats(preferFlatsForKey(key))
@@ -336,6 +306,7 @@ const SongDetail = ({ data }: any) => {
                     height={280}
                     alt={`${song?.title ?? ''} album art`}
                     className="rounded-2xl object-cover shadow-xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                    priority
                   />
                 </motion.div>
               )}
@@ -346,6 +317,7 @@ const SongDetail = ({ data }: any) => {
                   height={280}
                   alt={artist?.name ?? ''}
                   className="rounded-2xl object-cover shadow-xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                  priority
                 />
               )}
             </div>
@@ -454,15 +426,7 @@ const SongDetail = ({ data }: any) => {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="flex flex-wrap gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 share-buttons no-print">
-                  <FacebookShareButton url={shareUrl} title={ogTitle}><FacebookIcon className="hover:scale-110 transition-transform" style={iconStyle} /></FacebookShareButton>
-                  <TwitterShareButton url={shareUrl} title={ogTitle}><TwitterIcon className="hover:scale-110 transition-transform" style={iconStyle} /></TwitterShareButton>
-                  <WhatsappShareButton url={shareUrl} title={ogTitle}><WhatsappIcon className="hover:scale-110 transition-transform" style={iconStyle} /></WhatsappShareButton>
-                  <TelegramShareButton url={shareUrl} title={ogTitle}><TelegramIcon className="hover:scale-110 transition-transform" style={iconStyle} /></TelegramShareButton>
-                  <LinkedinShareButton url={shareUrl} title={ogTitle}><LinkedinIcon className="hover:scale-110 transition-transform" style={iconStyle} /></LinkedinShareButton>
-                  <RedditShareButton url={shareUrl} title={ogTitle}><RedditIcon className="hover:scale-110 transition-transform" style={iconStyle} /></RedditShareButton>
-                  <EmailShareButton url={shareUrl} subject={ogTitle}><EmailIcon className="hover:scale-110 transition-transform" style={iconStyle} /></EmailShareButton>
-                </div>
+                <ShareButtons url={shareUrl} title={ogTitle} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -709,7 +673,7 @@ const SongDetail = ({ data }: any) => {
 
       {contentChords.length > 0 && (
         <SectionReveal>
-          <div ref={(el) => { sectionRefs.current[0] = el }}>
+          <div>
             <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
               Chord Diagrams
             </h2>
