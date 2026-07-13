@@ -13,8 +13,8 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
     const search = sp.q || undefined
     const difficulty = sp.difficulty || undefined
 
-    const result = await searchSongsAdmin({ search, difficulty, page }).catch(() => ({
-        songs: [], totalCount: 0, page: 1, totalPages: 1,
+    const result = await searchSongsAdmin({ search, difficulty, page }).catch((): { data: any[]; totalCount: number; page: number; totalPages: number } => ({
+        data: [], totalCount: 0, page: 1, totalPages: 1,
     }))
 
     return (
@@ -42,7 +42,7 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
                 </div>
             </div>
             <SongsList
-                songs={result.songs}
+                songs={result.data}
                 totalCount={result.totalCount}
                 currentPage={result.page}
                 totalPages={result.totalPages}

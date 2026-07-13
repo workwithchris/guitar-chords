@@ -19,8 +19,8 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
     const sortOrder = (sp.dir as any) || 'desc'
 
     const [result, genres] = await Promise.all([
-        fetchActiveSongsWithParams({ page, difficulty, genre, sortBy, sortOrder }).catch(() => ({
-            songs: [], totalCount: 0, page: 1, totalPages: 1,
+        fetchActiveSongsWithParams({ page, difficulty, genre, sortBy, sortOrder }).catch((): { data: any[]; totalCount: number; page: number; totalPages: number } => ({
+            data: [], totalCount: 0, page: 1, totalPages: 1,
         })),
         getDistinctGenres().catch(() => []),
     ])
@@ -38,7 +38,7 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
             <div className="border-t border-neutral-200 dark:border-neutral-800" />
             <Suspense>
                 <SongsList
-                    songs={result.songs}
+                    songs={result.data as any}
                     genres={genres}
                     totalCount={result.totalCount}
                     currentPage={result.page}

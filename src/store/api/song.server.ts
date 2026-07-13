@@ -1,10 +1,11 @@
 import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
 import { createServerClient } from "@/core/supabase/server"
+import type { Song, Artist, PaginatedResult, HomeStats } from '@/core/types'
 
-async function _fetchActiveSongs(): Promise<any[]> {
+async function _fetchActiveSongs(): Promise<Song[]> {
     const supabase = createServerClient()
-    const { data: songs, error }: any = await supabase
+    const { data, error } = await supabase
         .from("song")
         .select("*, artist!inner(name,isActive,id)")
         .eq("isActive", true)
@@ -12,40 +13,41 @@ async function _fetchActiveSongs(): Promise<any[]> {
         .order("createdAt", { ascending: false })
         .limit(100)
     if (error) throw new Error(error.message)
-    return songs ?? []
+    return (data ?? []) as unknown as Song[]
 }
 
 export const fetchActiveSongsServer = cache(unstable_cache(_fetchActiveSongs, ['songs-active'], { revalidate: 60 }))
 
-async function _fetchActiveArtistsWithSongCount(): Promise<any[]> {
+async function _fetchActiveArtistsWithSongCount(): Promise<Artist[]> {
     const supabase = createServerClient()
-    const { data: artists, error }: any = await supabase
+    const { data, error } = await supabase
         .from("artist_with_song_count")
         .select("*")
         .eq("isActive", true)
     if (error) throw new Error(error.message)
-    return artists ?? []
+    return (data ?? []) as unknown as Artist[]
 }
 
 export const fetchActiveArtistsWithSongCountServer = cache(unstable_cache(_fetchActiveArtistsWithSongCount, ['artists-active-count'], { revalidate: 300 }))
 
-async function _fetchSongBySlug(slug: string): Promise<{ song: any; artist: any }> {
+async function _fetchSongBySlug(slug: string): Promise<{ song: Song; artist: Artist }> {
     const supabase = createServerClient()
-    const { data: song, error }: any = await supabase
+    const { data: song, error } = await supabase
         .from("song")
         .select("*")
         .eq("slug", slug)
         .single()
     if (error || !song) throw new Error(error?.message || "Song not found")
+    const typedSong = song as unknown as Song
 
-    const { data: artist, error: artistError }: any = await supabase
+    const { data: artist, error: artistError } = await supabase
         .from("artist")
         .select("*")
-        .eq("id", song.artistId)
+        .eq("id", typedSong.artistId)
         .single()
     if (artistError || !artist) throw new Error(artistError?.message || "Artist not found")
 
-    return { song, artist }
+    return { song: typedSong, artist: artist as unknown as Artist }
 }
 
 export const fetchSongBySlugServer = cache(async (slug: string) => {
@@ -57,15 +59,15 @@ export const fetchSongBySlugServer = cache(async (slug: string) => {
     return getCached()
 })
 
-async function _fetchArtistBySlug(slug: string): Promise<any> {
+async function _fetchArtistBySlug(slug: string): Promise<Artist> {
     const supabase = createServerClient()
-    const { data, error }: any = await supabase
+    const { data, error } = await supabase
         .from("artist")
         .select("*")
         .eq("slug", slug)
         .single()
     if (error) throw new Error(error.message)
-    return data
+    return data as unknown as Artist
 }
 
 export const fetchArtistBySlugServer = cache(async (slug: string) => {
@@ -77,20 +79,21 @@ export const fetchArtistBySlugServer = cache(async (slug: string) => {
     return getCached()
 })
 
-async function _fetchSongsByArtistSlug(slug: string): Promise<any[]> {
+async function _fetchSongsByArtistSlug(slug: string): Promise<Song[]> {
     const supabase = createServerClient()
-    const { data: artist }: any = await supabase
+    const { data: artist } = await supabase
         .from("artist")
         .select("id")
         .eq("slug", slug)
         .single()
     if (!artist) throw new Error("Artist not found")
+    const a = artist as unknown as { id: number }
 
-    const { data: songs }: any = await supabase
+    const { data: songs } = await supabase
         .from("song")
         .select("*")
-        .eq("artistId", artist.id)
-    return songs ?? []
+        .eq("artistId", a.id)
+    return (songs ?? []) as unknown as Song[]
 }
 
 export const fetchSongsByArtistSlugServer = cache(async (slug: string) => {
@@ -102,18 +105,18 @@ export const fetchSongsByArtistSlugServer = cache(async (slug: string) => {
     return getCached()
 })
 
-async function _getHomeStats(): Promise<{ totalSongs: number; totalArtists: number; totalGenres: number; beginnerCount: number }> {
+async function _getHomeStats(): Promise<HomeStats> {
     const supabase = createServerClient()
-    const { data, error }: any = await supabase.rpc('get_home_stats')
+    const { data, error } = await supabase.rpc('get_home_stats')
     if (error) throw new Error(error.message)
     return data?.[0] ?? { totalSongs: 0, totalArtists: 0, totalGenres: 0, beginnerCount: 0 }
 }
 
 export const getHomeStats = cache(unstable_cache(_getHomeStats, ['home-stats'], { revalidate: 60 }))
 
-async function _getRecentSongs(limit = 6): Promise<any[]> {
+async function _getRecentSongs(limit = 6): Promise<Song[]> {
     const supabase = createServerClient()
-    const { data, error }: any = await supabase
+    const { data, error } = await supabase
         .from("song")
         .select("id, title, slug, image, difficulty, artist!inner(name,isActive,id)")
         .eq("isActive", true)
@@ -121,7 +124,7 @@ async function _getRecentSongs(limit = 6): Promise<any[]> {
         .order("createdAt", { ascending: false })
         .limit(limit)
     if (error) throw new Error(error.message)
-    return data ?? []
+    return (data ?? []) as unknown as Song[]
 }
 
 export const getRecentSongs = cache(async (limit = 6) => {
@@ -133,30 +136,30 @@ export const getRecentSongs = cache(async (limit = 6) => {
     return getCached()
 })
 
-async function _getFeaturedArtist(): Promise<any | null> {
+async function _getFeaturedArtist(): Promise<Artist | null> {
     const supabase = createServerClient()
-    const { data: artists, error }: any = await supabase
+    const { data: artists, error } = await supabase
         .from("artist_with_song_count")
         .select("*")
         .eq("isActive", true)
         .order("songCount", { ascending: false })
         .limit(1)
     if (error) throw new Error(error.message)
-    return artists?.[0] ?? null
+    return (artists?.[0] ?? null) as unknown as Artist | null
 }
 
 export const getFeaturedArtist = cache(unstable_cache(_getFeaturedArtist, ['featured-artist'], { revalidate: 300 }))
 
 async function _getDistinctGenres(): Promise<string[]> {
     const supabase = createServerClient()
-    const { data, error }: any = await supabase
+    const { data, error } = await supabase
         .from("song")
         .select("genre")
         .eq("isActive", true)
         .not("genre", "is", null)
         .limit(100)
     if (error) throw new Error(error.message)
-    return [...new Set((data ?? []).map((r: any) => r.genre).filter(Boolean))] as string[]
+    return [...new Set(((data ?? []) as any[]).map((r: any) => r.genre).filter(Boolean))] as string[]
 }
 
 export const getDistinctGenres = cache(unstable_cache(_getDistinctGenres, ['distinct-genres'], { revalidate: 300 }))
@@ -170,7 +173,7 @@ type SongsQueryParams = {
     sortOrder?: 'asc' | 'desc'
 }
 
-async function _fetchActiveSongsWithParams(params: SongsQueryParams): Promise<{ songs: any[]; totalCount: number; page: number; totalPages: number }> {
+async function _fetchActiveSongsWithParams(params: SongsQueryParams): Promise<PaginatedResult<Song>> {
     const { page = 1, limit = 24, difficulty, genre, sortBy = 'createdAt', sortOrder = 'desc' } = params
     const supabase = createServerClient()
 
@@ -193,7 +196,7 @@ async function _fetchActiveSongsWithParams(params: SongsQueryParams): Promise<{ 
     if (error) throw new Error(error.message)
 
     return {
-        songs: data ?? [],
+        data: (data ?? []) as unknown as Song[],
         totalCount: count ?? 0,
         page,
         totalPages: Math.ceil((count ?? 0) / limit),
@@ -219,7 +222,7 @@ type ArtistsQueryParams = {
     sortOrder?: 'asc' | 'desc'
 }
 
-async function _fetchActiveArtistsWithParams(params: ArtistsQueryParams): Promise<{ artists: any[]; totalCount: number; page: number; totalPages: number }> {
+async function _fetchActiveArtistsWithParams(params: ArtistsQueryParams): Promise<PaginatedResult<Artist>> {
     const { page = 1, limit = 24, letter, search, sortBy = 'songCount', sortOrder = 'desc' } = params
     const supabase = createServerClient()
 
@@ -239,15 +242,14 @@ async function _fetchActiveArtistsWithParams(params: ArtistsQueryParams): Promis
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    const sortColumn = sortBy === 'name' ? 'name' : 'name'
     const { data, error, count } = await query
-        .order(sortColumn, { ascending: sortOrder === 'asc' })
+        .order("name", { ascending: sortOrder === 'asc' })
         .range(from, to)
 
     if (error) throw new Error(error.message)
 
     return {
-        artists: data ?? [],
+        data: (data ?? []) as unknown as Artist[],
         totalCount: count ?? 0,
         page,
         totalPages: Math.ceil((count ?? 0) / limit),
@@ -271,7 +273,7 @@ type AdminSongsParams = {
     limit?: number
 }
 
-async function _searchSongsAdmin(params: AdminSongsParams): Promise<{ songs: any[]; totalCount: number; page: number; totalPages: number }> {
+async function _searchSongsAdmin(params: AdminSongsParams): Promise<PaginatedResult<Song>> {
     const { search, difficulty, page = 1, limit = 50 } = params
     const supabase = createServerClient()
 
@@ -294,7 +296,7 @@ async function _searchSongsAdmin(params: AdminSongsParams): Promise<{ songs: any
         .range(from, to)
 
     if (error) throw new Error(error.message)
-    return { songs: data ?? [], totalCount: count ?? 0, page, totalPages: Math.ceil((count ?? 0) / limit) }
+    return { data: (data ?? []) as unknown as Song[], totalCount: count ?? 0, page, totalPages: Math.ceil((count ?? 0) / limit) }
 }
 
 export const searchSongsAdmin = cache(async (params: AdminSongsParams) => {
@@ -307,7 +309,7 @@ type AdminArtistsParams = {
     limit?: number
 }
 
-async function _searchArtistsAdmin(params: AdminArtistsParams): Promise<{ artists: any[]; totalCount: number; page: number; totalPages: number }> {
+async function _searchArtistsAdmin(params: AdminArtistsParams): Promise<PaginatedResult<Artist>> {
     const { search, page = 1, limit = 50 } = params
     const supabase = createServerClient()
 
@@ -327,7 +329,7 @@ async function _searchArtistsAdmin(params: AdminArtistsParams): Promise<{ artist
         .range(from, to)
 
     if (error) throw new Error(error.message)
-    return { artists: data ?? [], totalCount: count ?? 0, page, totalPages: Math.ceil((count ?? 0) / limit) }
+    return { data: (data ?? []) as unknown as Artist[], totalCount: count ?? 0, page, totalPages: Math.ceil((count ?? 0) / limit) }
 }
 
 export const searchArtistsAdmin = cache(async (params: AdminArtistsParams) => {

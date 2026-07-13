@@ -10,8 +10,8 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
     const page = parseInt(sp.page ?? '1', 10)
     const search = sp.q || undefined
 
-    const result = await searchArtistsAdmin({ search, page }).catch(() => ({
-        artists: [], totalCount: 0, page: 1, totalPages: 1,
+    const result = await searchArtistsAdmin({ search, page }).catch((): { data: any[]; totalCount: number; page: number; totalPages: number } => ({
+        data: [], totalCount: 0, page: 1, totalPages: 1,
     }))
 
     return (
@@ -26,7 +26,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
                 <AddArtist />
             </div>
             <ArtistsList
-                artists={result.artists}
+                artists={result.data}
                 totalCount={result.totalCount}
                 currentPage={result.page}
                 totalPages={result.totalPages}

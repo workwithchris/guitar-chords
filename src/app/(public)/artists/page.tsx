@@ -18,8 +18,8 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
     const sortBy = (sp.sort as any) || 'songCount'
     const sortOrder = (sp.dir as any) || 'desc'
 
-    const result = await fetchActiveArtistsWithParams({ page, letter, search, sortBy, sortOrder }).catch(() => ({
-        artists: [], totalCount: 0, page: 1, totalPages: 1,
+    const result = await fetchActiveArtistsWithParams({ page, letter, search, sortBy, sortOrder }).catch((): { data: any[]; totalCount: number; page: number; totalPages: number } => ({
+        data: [], totalCount: 0, page: 1, totalPages: 1,
     }))
 
     return (
@@ -35,7 +35,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
             <div className="border-t border-neutral-200 dark:border-neutral-800" />
             <Suspense>
                 <ArtistsList
-                    artists={result.artists}
+                    artists={result.data as any}
                     totalCount={result.totalCount}
                     currentPage={result.page}
                     totalPages={result.totalPages}
