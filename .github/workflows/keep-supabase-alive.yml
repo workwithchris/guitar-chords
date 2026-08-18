@@ -1,0 +1,25 @@
+name: Keep Supabase Alive
+
+# Supabase free-tier projects pause after ~7 days of inactivity.
+# A periodic ping to the API gateway resets that timer.
+# Any HTTP response (even 4xx) means the project is awake.
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # every 24 hours
+  workflow_dispatch: # manual run
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping Supabase health endpoint
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          code=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            https://ibfyqjygsempcfjpwwqi.supabase.co/auth/v1/health)
+          echo "Supabase health: ${code}"
+          test -n "${code}"
