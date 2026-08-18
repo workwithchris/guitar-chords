@@ -73,7 +73,8 @@ async function searchSongsByArtistIds(artistIds: number[]): Promise<SongSearchRe
     const { data: songs, error } = await supabase
         .from("song")
         .select("id, title, slug, image, writtenBy, year, artist(name,isActive,id)")
-        .in("artistId", artistIds);
+        .in("artistId", artistIds)
+        .eq("isActive", true);
 
     if (error) {
         throw new Error(error.message);
