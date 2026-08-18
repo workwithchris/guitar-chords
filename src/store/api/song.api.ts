@@ -6,7 +6,7 @@ export async function fetchSongs() {
             .from("song")
             .select("*, artist(name,isActive,id)")
             .order("createdAt", { ascending: false })
-            .limit(10000);
+            .limit(100);
         if (songsError) {
             throw new Error(songsError.message);
         }
@@ -24,7 +24,7 @@ export async function fetchActiveSongs() {
             .eq("isActive", true)
             .eq("artist.isActive", true)
             .order("createdAt", { ascending: false })
-            .limit(10000);
+            .limit(100);
         if (songsError) {
             throw new Error(songsError.message);
         }
@@ -140,6 +140,16 @@ export async function deleteSong(songId: number) {
         .eq("id", songId)
 }
 
+export async function bulkUpdateSongs(ids: number[], updates: any) {
+    const { error } = await supabase.from("song").update(updates).in("id", ids)
+    if (error) throw new Error(error.message)
+}
+
+export async function bulkDeleteSongs(ids: number[]) {
+    const { error } = await supabase.from("song").delete().in("id", ids)
+    if (error) throw new Error(error.message)
+}
+
 export async function updateSongIsActive(songId: number, isActive: boolean): Promise<boolean> {
     try {
         const { error } = await supabase
@@ -152,6 +162,22 @@ export async function updateSongIsActive(songId: number, isActive: boolean): Pro
         return true
     } catch (error: any) {
         throw new Error(`Error updating isActive state of song: ${error.message}`)
+    }
+}
+
+export async function fetchSongsByKey(key: string, excludeId?: number, limit = 4) {
+    try {
+        const { data, error } = await supabase
+            .from("song")
+            .select("id, title, slug, image, difficulty, artist!inner(name,isActive,id)")
+            .eq("key", key)
+            .eq("isActive", true)
+            .eq("artist.isActive", true)
+            .limit(limit)
+        if (error) throw new Error(error.message)
+        return (data ?? []).filter((s: any) => s.id !== excludeId) as any[]
+    } catch (error: any) {
+        throw new Error(`Error fetching songs by key: ${error.message}`)
     }
 }
 

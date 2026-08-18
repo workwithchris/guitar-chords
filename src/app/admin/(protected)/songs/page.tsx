@@ -1,14 +1,22 @@
 import React from 'react'
 import SongsList from './components/list'
-import { fetchSongs } from '@/store/api/song.api'
+import { searchSongsAdmin } from '@/store/api/song.server'
 import { Plus, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button/button'
 
 export const revalidate = 0
 
-export default async function SongsPage() {
-    const songs: any[] = await fetchSongs()
+export default async function SongsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
+    const sp = await searchParams
+    const page = parseInt(sp.page ?? '1', 10)
+    const search = sp.q || undefined
+    const difficulty = sp.difficulty || undefined
+
+    const result = await searchSongsAdmin({ search, difficulty, page }).catch((): { data: any[]; totalCount: number; page: number; totalPages: number } => ({
+        data: [], totalCount: 0, page: 1, totalPages: 1,
+    }))
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -33,7 +41,14 @@ export default async function SongsPage() {
                     </Link>
                 </div>
             </div>
-            <SongsList songs={songs} />
+            <SongsList
+                songs={result.data}
+                totalCount={result.totalCount}
+                currentPage={result.page}
+                totalPages={result.totalPages}
+                currentSearch={search}
+                currentDifficulty={difficulty}
+            />
         </div>
     )
 }

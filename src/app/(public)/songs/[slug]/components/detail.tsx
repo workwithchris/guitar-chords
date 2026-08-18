@@ -1,34 +1,25 @@
 "use client"
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { fetchRelatedSongs } from '@/store/api/song.api'
 import {
   Pause, Play, Share2, User, Calendar, PenLine, ArrowLeft,
   Music, ChevronUp, ChevronDown, Heart, Printer, Plus, Minus,
-  PictureInPicture2, Maximize2, Minimize2, X,
+  PictureInPicture2, Maximize2, Minimize2, X, Copy,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 import { useFavorites } from '@/lib/use-favorites'
 import { trackPageView } from '@/store/api/analytics.api'
-import { ChordDiagramList } from '@/components/ui/chord-diagram'
-import ChordPopoverContainer from '@/components/ui/chord-popover'
 import { preferFlatsForKey, transposeChordToken, wrapChords, extractChordsFromHtml } from '@/lib/chords'
 import ChordSheetRenderer, { hasHtmlTags, parseChordSheet } from '@/components/chord-sheet-renderer'
-import {
-  EmailIcon, EmailShareButton, FacebookIcon, FacebookShareButton,
-  LinkedinIcon, LinkedinShareButton, RedditIcon, RedditShareButton,
-  TelegramIcon, TelegramShareButton, TwitterIcon, TwitterShareButton,
-  WhatsappIcon, WhatsappShareButton,
-} from 'react-share'
 
-const iconStyle = { borderRadius: '50%', height: 36, width: 36 }
+const ShareButtons = dynamic(() => import('./share-buttons'), { ssr: false })
+const ChordDiagramList = dynamic(() => import('@/components/ui/chord-diagram').then(m => ({ default: m.ChordDiagramList })), { ssr: false })
+const ChordPopoverContainer = dynamic(() => import('@/components/ui/chord-popover'), { ssr: false })
 const FONT_SIZES = [13, 15, 17, 19, 22]
 const SPEED_OPTIONS = [0.8, 1.5, 3, 5]
 
@@ -73,46 +64,27 @@ const SongDetail = ({ data }: any) => {
   const [scrollSpeed, setScrollSpeed] = useState(1.5)
   const [fontSize, setFontSize] = useState(15)
   const [related, setRelated] = useState<any[]>([])
+  const [sameKeySongs, setSameKeySongs] = useState<any[]>([])
   const [videoFloating, setVideoFloating] = useState(false)
   const [videoMinimized, setVideoMinimized] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const pathName = usePathname()
   const lyricsRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
   const manualScrollRef = useRef(false)
   const isAutoScrollingRef = useRef(false)
-  const manualScrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
-  const heroRef = useRef<HTMLDivElement>(null)
+    const manualScrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const heroRef = useRef<HTMLDivElement>(null)
 
-  const song = data?.song
-  const artist = data?.artist
-  const capo = Number(song?.capo ?? 0)
+    const song = data?.song
+    const artist = data?.artist
+    const capo = Number(song?.capo ?? 0)
 
-  const { isFavorite, toggleFavorite } = useFavorites()
-  const fav = song ? isFavorite(song.id) : false
+    const { isFavorite, toggleFavorite } = useFavorites()
+    const fav = song ? isFavorite(song.id) : false
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      sectionRefs.current.forEach((el) => {
-        if (!el) return
-        gsap.fromTo(el,
-          { autoAlpha: 0, y: 24 },
-          {
-            autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out',
-            scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
-          }
-        )
-      })
-    })
-
-    return () => {
-      ctx.revert()
-      ScrollTrigger.getAll().forEach((st) => st.kill())
-    }
-  }, [])
-
-  useEffect(() => {
+    useEffect(() => {
     if (song) {
       const key = song.key as string | undefined
       if (key) setUseFlats(preferFlatsForKey(key))
@@ -146,6 +118,11 @@ const SongDetail = ({ data }: any) => {
     fetchRelatedSongs(song.id, song.genre, song.key, song.artistId)
       .then(setRelated)
       .catch(() => {})
+    if (song.key) {
+      import('@/store/api/song.api').then(m =>
+        m.fetchSongsByKey(song.key, song.id).then(setSameKeySongs).catch(() => {})
+      )
+    }
   }, [song])
 
   useEffect(() => {
@@ -224,6 +201,16 @@ const SongDetail = ({ data }: any) => {
 
   const togglePlayback = useCallback(() => setIsPlaying((p) => !p), [])
   const handlePrint = useCallback(() => window.print(), [])
+
+  const handleCopyChords = useCallback(async () => {
+    const text = song?.content ?? ''
+    if (!text) return
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }, [song?.content])
 
   const decreaseFont = useCallback(() => {
     setFontSize((s) => {
@@ -336,6 +323,7 @@ const SongDetail = ({ data }: any) => {
                     height={280}
                     alt={`${song?.title ?? ''} album art`}
                     className="rounded-2xl object-cover shadow-xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                    priority
                   />
                 </motion.div>
               )}
@@ -346,6 +334,7 @@ const SongDetail = ({ data }: any) => {
                   height={280}
                   alt={artist?.name ?? ''}
                   className="rounded-2xl object-cover shadow-xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                  priority
                 />
               )}
             </div>
@@ -443,6 +432,16 @@ const SongDetail = ({ data }: any) => {
                 <Printer className="h-4 w-4" />
               </motion.button>
             </motion.div>
+            <motion.div variants={itemVar} className="hidden md:block">
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={handleCopyChords}
+                aria-label="Copy chords"
+                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+              >
+                <Copy className="h-4 w-4" />
+              </motion.button>
+            </motion.div>
           </StaggerRow>
 
           <AnimatePresence>
@@ -454,15 +453,7 @@ const SongDetail = ({ data }: any) => {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="flex flex-wrap gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 share-buttons no-print">
-                  <FacebookShareButton url={shareUrl} title={ogTitle}><FacebookIcon className="hover:scale-110 transition-transform" style={iconStyle} /></FacebookShareButton>
-                  <TwitterShareButton url={shareUrl} title={ogTitle}><TwitterIcon className="hover:scale-110 transition-transform" style={iconStyle} /></TwitterShareButton>
-                  <WhatsappShareButton url={shareUrl} title={ogTitle}><WhatsappIcon className="hover:scale-110 transition-transform" style={iconStyle} /></WhatsappShareButton>
-                  <TelegramShareButton url={shareUrl} title={ogTitle}><TelegramIcon className="hover:scale-110 transition-transform" style={iconStyle} /></TelegramShareButton>
-                  <LinkedinShareButton url={shareUrl} title={ogTitle}><LinkedinIcon className="hover:scale-110 transition-transform" style={iconStyle} /></LinkedinShareButton>
-                  <RedditShareButton url={shareUrl} title={ogTitle}><RedditIcon className="hover:scale-110 transition-transform" style={iconStyle} /></RedditShareButton>
-                  <EmailShareButton url={shareUrl} subject={ogTitle}><EmailIcon className="hover:scale-110 transition-transform" style={iconStyle} /></EmailShareButton>
-                </div>
+                <ShareButtons url={shareUrl} title={ogTitle} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -709,7 +700,7 @@ const SongDetail = ({ data }: any) => {
 
       {contentChords.length > 0 && (
         <SectionReveal>
-          <div ref={(el) => { sectionRefs.current[0] = el }}>
+          <div>
             <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
               Chord Diagrams
             </h2>
@@ -745,6 +736,51 @@ const SongDetail = ({ data }: any) => {
           <ChordPopoverContainer containerRef={lyricsRef} capo={concertPitch ? 0 : capo} />
         </div>
       </SectionReveal>
+
+      {sameKeySongs.length > 0 && (
+        <SectionReveal>
+          <div className="space-y-4">
+            <div className="border-t border-neutral-200 dark:border-neutral-800" />
+            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+              More in {song?.key}
+            </h2>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              {sameKeySongs.map((r: any) => (
+                <motion.div
+                  key={r.id}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                >
+                  <Link
+                    href={`/songs/${r.slug}`}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all group"
+                  >
+                    {r.image ? (
+                      <Image src={r.image} width={36} height={36} alt="" className="rounded-lg object-cover shrink-0" />
+                    ) : (
+                      <div className="h-9 w-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
+                        <Music className="h-4 w-4 text-neutral-500" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">{r.title}</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{r.artist?.name}</p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </SectionReveal>
+      )}
 
       {related.length > 0 && (
         <SectionReveal>

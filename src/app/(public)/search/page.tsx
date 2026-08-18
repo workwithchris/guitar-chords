@@ -6,19 +6,22 @@ import SearchClient from './components/search-client'
 
 export const revalidate = 0
 
+const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
+
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ query: string }> }): Promise<Metadata> {
     const { query } = await searchParams
-    const title = query ? `Search: ${query} - Guitar Chords` : 'Search - Guitar Chords'
+    const title = query ? `Search: ${query}` : 'Search'
     const description = query ? `Search results for guitar chords and lyrics matching "${query}".` : 'Search guitar chords and lyrics by song or artist.'
     return {
         title,
         description,
         openGraph: {
-            title, description,
-            url: `https://guitarchords.techyatraa.com/search${query ? `?query=${encodeURIComponent(query)}` : ''}`,
-            siteName: 'Guitar Chords',
+            title: query ? `Search: ${query} - Guitar Chords` : 'Search - Guitar Chords',
+            description,
+            url: `/search${query ? `?query=${encodeURIComponent(query)}` : ''}`,
         },
         twitter: { card: 'summary_large_image', title, description },
+        alternates: { canonical: `${baseUrl}/search` },
     }
 }
 

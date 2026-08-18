@@ -2,11 +2,11 @@
 import { Switch } from '@/components/ui/switch/switch'
 import { Badge } from '@/components/ui/badge'
 import { useSongStore } from '@/store/song.store'
-import { useRouter } from 'next/navigation'
-import { Pencil, Trash2, Search, Music } from 'lucide-react'
+import { useRouter, usePathname } from 'next/navigation'
+import { Pencil, Trash2, Search, Music, CheckCheck, XCircle, ToggleLeft } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from '@/components/ui/toast/use-toast'
-import React, { useMemo, useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button/button'
 import { Input } from '@/components/ui/form/input'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -20,6 +20,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Card, CardContent } from '@/components/ui/card'
+import { bulkUpdateSongs, bulkDeleteSongs } from '@/store/api/song.api'
 
 const difficultyColor: Record<string, "success" | "warning" | "destructive"> = {
     Beginner: 'success',
@@ -27,23 +28,91 @@ const difficultyColor: Record<string, "success" | "warning" | "destructive"> = {
     Advanced: 'destructive',
 }
 
-export default function SongsList({ songs }: { songs: any[] }) {
-    const { songs: data, setSongs, updateActiveToggle, delete: removeSong }: any = useSongStore()
+export default function SongsList({
+    songs,
+    totalCount,
+    currentPage,
+    totalPages,
+    currentSearch,
+    currentDifficulty,
+}: {
+    songs: any[]
+    totalCount: number
+    currentPage: number
+    totalPages: number
+    currentSearch?: string
+    currentDifficulty?: string
+}) {
+    const { updateActiveToggle, delete: removeSong }: any = useSongStore()
     const router = useRouter()
-    const [search, setSearch] = useState('')
-    const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null)
+    const pathname = usePathname()
+    const [search, setSearch] = useState(currentSearch ?? '')
     const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null)
     const [deleting, setDeleting] = useState(false)
-    const [loading, setLoading] = useState(true)
-    const [page, setPage] = useState(1)
-    const pageSize = 50
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+    const [bulkLoading, setBulkLoading] = useState(false)
 
-    React.useEffect(() => {
-        if (songs) {
-            setSongs(songs)
-            setLoading(false)
+    function buildUrl(overrides: Record<string, string | null>) {
+        const next = new URLSearchParams()
+        if (overrides.q ?? search) next.set('q', overrides.q ?? search)
+        if (overrides.difficulty ?? currentDifficulty) next.set('difficulty', overrides.difficulty ?? currentDifficulty!)
+        if (overrides.page && overrides.page !== '1') next.set('page', overrides.page)
+        const qs = next.toString()
+        return qs ? `${pathname}?${qs}` : pathname
+    }
+
+    function navigate(overrides: Record<string, string | null>) {
+        router.push(buildUrl(overrides), { scroll: false })
+    }
+
+    function handleSearchSubmit(e: React.FormEvent) {
+        e.preventDefault()
+        navigate({ q: search, page: '1' })
+    }
+
+    const allIds = songs.map((s: any) => s.id)
+    const allSelected = songs.length > 0 && selectedIds.size === songs.length
+
+    const toggleSelect = (id: number) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev)
+            if (next.has(id)) next.delete(id)
+            else next.add(id)
+            return next
+        })
+    }
+
+    const toggleSelectAll = () => {
+        if (allSelected) setSelectedIds(new Set())
+        else setSelectedIds(new Set(allIds))
+    }
+
+    const handleBulkDelete = async () => {
+        if (!confirm(`Delete ${selectedIds.size} songs?`)) return
+        setBulkLoading(true)
+        try {
+            await bulkDeleteSongs(Array.from(selectedIds))
+            toast({ title: `${selectedIds.size} songs deleted` })
+            setSelectedIds(new Set())
+        } catch {
+            toast({ title: 'Failed to delete songs' })
+        } finally {
+            setBulkLoading(false)
         }
-    }, [songs, setSongs])
+    }
+
+    const handleBulkActivate = async (active: boolean) => {
+        setBulkLoading(true)
+        try {
+            await bulkUpdateSongs(Array.from(selectedIds), { isActive: active })
+            toast({ title: `${selectedIds.size} songs ${active ? 'activated' : 'deactivated'}` })
+            setSelectedIds(new Set())
+        } catch {
+            toast({ title: 'Bulk update failed' })
+        } finally {
+            setBulkLoading(false)
+        }
+    }
 
     const handleDelete = async () => {
         if (!deleteTarget) return
@@ -59,46 +128,14 @@ export default function SongsList({ songs }: { songs: any[] }) {
         }
     }
 
-    const filtered = useMemo(() => {
-        return (data ?? songs).filter((song: any) => {
-            const matchesSearch = song.title?.toLowerCase().includes(search.toLowerCase()) ||
-                song.artist?.name?.toLowerCase().includes(search.toLowerCase())
-            const matchesDifficulty = !difficultyFilter || song.difficulty === difficultyFilter
-            return matchesSearch && matchesDifficulty
-        })
-    }, [data, songs, search, difficultyFilter])
-
-    const totalPages = Math.ceil(filtered.length / pageSize)
-    const paginated = filtered.slice((page - 1) * pageSize, page * pageSize)
-
-    React.useEffect(() => { setPage(1) }, [search, difficultyFilter])
-
     const difficulties = ['Beginner', 'Intermediate', 'Advanced']
-
-    if (loading) {
-        return (
-            <Card>
-                <CardContent className="p-6 space-y-4">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center gap-4">
-                            <Skeleton className="h-10 flex-1" />
-                            <Skeleton className="h-10 w-20" />
-                            <Skeleton className="h-10 w-16" />
-                            <Skeleton className="h-10 w-20" />
-                            <Skeleton className="h-10 w-10" />
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
-        )
-    }
 
     return (
         <>
             <Card>
                 <CardContent className="p-6">
                     <div className="flex flex-wrap items-center gap-4 mb-6">
-                        <div className="relative flex-1 min-w-[200px] max-w-sm">
+                        <form onSubmit={handleSearchSubmit} className="relative flex-1 min-w-[200px] max-w-sm">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                             <Input
                                 placeholder="Search songs or artists..."
@@ -106,27 +143,54 @@ export default function SongsList({ songs }: { songs: any[] }) {
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-9"
                             />
-                        </div>
+                        </form>
                         <div className="flex gap-2">
                             {difficulties.map((d) => (
                                 <Button
                                     key={d}
-                                    variant={difficultyFilter === d ? 'default' : 'outline'}
+                                    variant={currentDifficulty === d ? 'default' : 'outline'}
                                     size="sm"
-                                    onClick={() => setDifficultyFilter(difficultyFilter === d ? null : d)}
+                                    onClick={() => navigate({ difficulty: currentDifficulty === d ? null : d, page: '1' })}
                                 >
                                     {d}
                                 </Button>
                             ))}
                         </div>
                         <p className="text-sm text-neutral-500 ml-auto">
-                            {filtered.length} song{filtered.length !== 1 ? 's' : ''}
-                            {totalPages > 1 && ` · Page ${page} of ${totalPages}`}
+                            {totalCount} song{totalCount !== 1 ? 's' : ''}
+                            {totalPages > 1 && ` · Page ${currentPage} of ${totalPages}`}
                         </p>
                     </div>
+                    {selectedIds.size > 0 && (
+                        <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mr-2">
+                                {selectedIds.size} selected
+                            </span>
+                            <Button variant="outline" size="sm" onClick={handleBulkDelete} disabled={bulkLoading}>
+                                <Trash2 className="h-3.5 w-3.5 mr-1" />
+                                Delete
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleBulkActivate(true)} disabled={bulkLoading}>
+                                <CheckCheck className="h-3.5 w-3.5 mr-1" />
+                                Activate
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleBulkActivate(false)} disabled={bulkLoading}>
+                                <XCircle className="h-3.5 w-3.5 mr-1" />
+                                Deactivate
+                            </Button>
+                        </div>
+                    )}
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead className="w-10">
+                                    <input
+                                        type="checkbox"
+                                        checked={allSelected}
+                                        onChange={toggleSelectAll}
+                                        className="rounded border-neutral-300 dark:border-neutral-600"
+                                    />
+                                </TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Artist</TableHead>
                                 <TableHead>Key</TableHead>
@@ -136,18 +200,18 @@ export default function SongsList({ songs }: { songs: any[] }) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filtered.length === 0 ? (
+                            {songs.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6}>
+                                    <TableCell colSpan={7}>
                                         <div className="flex flex-col items-center justify-center py-12 text-center">
                                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800 mb-4">
                                                 <Music className="h-6 w-6 text-neutral-400" />
                                             </div>
                                             <p className="text-sm font-medium text-neutral-900 dark:text-neutral-50">
-                                                {search || difficultyFilter ? 'No songs match your filters' : 'No songs yet'}
+                                                {currentSearch || currentDifficulty ? 'No songs match your filters' : 'No songs yet'}
                                             </p>
                                             <p className="text-xs text-neutral-500 mt-1">
-                                                {search || difficultyFilter
+                                                {currentSearch || currentDifficulty
                                                     ? 'Try adjusting your search or filters'
                                                     : 'Add your first song to get started'}
                                             </p>
@@ -155,8 +219,16 @@ export default function SongsList({ songs }: { songs: any[] }) {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                paginated.map((song: any) => (
+                                songs.map((song: any) => (
                                     <TableRow key={song.id}>
+                                        <TableCell className="w-10">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(song.id)}
+                                                onChange={() => toggleSelect(song.id)}
+                                                className="rounded border-neutral-300 dark:border-neutral-600"
+                                            />
+                                        </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 {song.image ? (
@@ -221,28 +293,28 @@ export default function SongsList({ songs }: { songs: any[] }) {
                     {totalPages > 1 && (
                         <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800 mt-4">
                             <p className="text-xs text-neutral-500">
-                                Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} of {filtered.length}
+                                Showing {(currentPage - 1) * 50 + 1}–{Math.min(currentPage * 50, totalCount)} of {totalCount}
                             </p>
                             <div className="flex items-center gap-1">
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                                    disabled={page === 1}
+                                    onClick={() => navigate({ page: String(currentPage - 1) })}
+                                    disabled={currentPage <= 1}
                                 >
                                     Previous
                                 </Button>
                                 {(() => {
                                     const pages: number[] = []
-                                    const start = Math.max(1, page - 2)
+                                    const start = Math.max(1, currentPage - 2)
                                     const end = Math.min(totalPages, start + 4)
                                     for (let p = start; p <= end; p++) pages.push(p)
                                     return pages.map(p => (
                                         <Button
                                             key={p}
-                                            variant={p === page ? 'default' : 'outline'}
+                                            variant={p === currentPage ? 'default' : 'outline'}
                                             size="sm"
-                                            onClick={() => setPage(p)}
+                                            onClick={() => navigate({ page: String(p) })}
                                             className="min-w-[32px]"
                                         >
                                             {p}
@@ -252,8 +324,8 @@ export default function SongsList({ songs }: { songs: any[] }) {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                    disabled={page === totalPages}
+                                    onClick={() => navigate({ page: String(currentPage + 1) })}
+                                    disabled={currentPage >= totalPages}
                                 >
                                     Next
                                 </Button>

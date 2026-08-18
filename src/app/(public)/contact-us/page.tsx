@@ -2,9 +2,17 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { Mail, MapPin, Globe } from 'lucide-react'
 
+const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
+
 export const metadata: Metadata = {
-    title: 'Contact Us - Guitar Chords',
-    description: 'Get in touch with the GuitarChords team. We\'d love to hear from you.',
+    title: 'Contact Us',
+    description: 'Get in touch with the GuitarChords team. We\'d love to hear your feedback and song suggestions.',
+    openGraph: {
+        title: 'Contact Us - Guitar Chords',
+        description: 'Get in touch with the GuitarChords team.',
+        url: '/contact-us',
+    },
+    alternates: { canonical: `${baseUrl}/contact-us` },
 }
 
 export default function ContactUsPage() {

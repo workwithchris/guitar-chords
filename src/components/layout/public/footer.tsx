@@ -4,9 +4,16 @@ import Link from 'next/link';
 const footerLinks = [
     { href: '/songs', label: 'Songs' },
     { href: '/artists', label: 'Artists' },
+    { href: '/chords', label: 'Chord Library' },
+    { href: '/blog', label: 'Blog' },
     { href: '/about-us', label: 'About' },
     { href: '/contact-us', label: 'Contact' },
     { href: '/request', label: 'Request a Song' },
+]
+
+const legalLinks = [
+    { href: '/privacy', label: 'Privacy' },
+    { href: '/terms', label: 'Terms' },
 ]
 
 export default function Footer() {
@@ -14,7 +21,7 @@ export default function Footer() {
     return (
         <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
             <div className="m-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-10">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex flex-col items-center gap-6">
                     <div className="flex flex-wrap items-center justify-center gap-6">
                         {footerLinks.map((link) => (
                             <Link
@@ -26,9 +33,18 @@ export default function Footer() {
                             </Link>
                         ))}
                     </div>
-                    <p className="text-sm text-neutral-400 dark:text-neutral-500">
-                        &copy; {currentYear} TechYatraa. All rights reserved.
-                    </p>
+                    <div className="flex items-center gap-4 text-xs text-neutral-400 dark:text-neutral-500">
+                        {legalLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                        <span>&copy; {currentYear} TechYatraa. All rights reserved.</span>
+                    </div>
                 </div>
             </div>
         </footer>

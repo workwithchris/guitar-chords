@@ -3,9 +3,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Music, Mail, ArrowRight } from 'lucide-react'
 
+const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
+
 export const metadata: Metadata = {
-    title: 'Request a Song - Guitar Chords',
-    description: 'Can\'t find the song you\'re looking for? Request it and we\'ll add the guitar chords and lyrics.',
+    title: 'Request a Song',
+    description: 'Can\'t find the song you\'re looking for? Request it and we\'ll add the guitar chords and lyrics to our collection.',
+    openGraph: {
+        title: 'Request a Song - Guitar Chords',
+        description: 'Can\'t find a song? Request guitar chords and lyrics.',
+        url: '/request',
+    },
+    alternates: { canonical: `${baseUrl}/request` },
 }
 
 export default function RequestSongPage() {

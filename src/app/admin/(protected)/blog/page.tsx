@@ -1,6 +1,6 @@
 import React from 'react'
 import BlogList from './components/list'
-import { fetchBlogPosts } from '@/store/api/blog.api'
+import { fetchBlogPosts } from '@/store/api/blog.server'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button/button'

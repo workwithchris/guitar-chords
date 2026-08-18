@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Music, Users, FileText, LogOut, Menu } from "lucide-react"
+import { LayoutDashboard, Music, Users, FileText, LogOut, Menu, Activity } from "lucide-react"
 import { Button } from "@/components/ui/button/button"
 import { ModeToggle } from "@/components/ui/button/toggle-mode"
 import { useAuthStore } from "@/store/auth.store"

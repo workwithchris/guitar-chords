@@ -24,17 +24,14 @@ export const useArtistStore = create((set) => ({
     add: async (artist: any) => {
         const { error } = await addArtist(artist);
         if (error) throw new Error(error.message)
-        set({ artists: await fetchArtists() ?? [] });
     },
     update: async (artistId: number, artist: any) => {
         const { error } = await updateArtist(artistId, artist);
         if (error) throw new Error(error.message)
-        set({ artists: await fetchArtists() ?? [] });
     },
     delete: async (artistId: number) => {
         const { error } = await deleteArtist(artistId);
         if (error) throw new Error(error.message)
-        set({ artists: await fetchArtists() ?? [] });
     },
     setArtists: (artists: any[]) => {
         set({ artists });
@@ -44,6 +41,5 @@ export const useArtistStore = create((set) => ({
     },
     updateActiveToogle: async (artistId: number, isActive: boolean) => {
         await updateArtistIsActive(artistId, isActive);
-        set({ artists: await fetchArtists() ?? [] });
     },
 }));
