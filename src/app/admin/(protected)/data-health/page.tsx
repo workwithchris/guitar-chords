@@ -185,7 +185,7 @@ export default function DataHealthPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Data Health</h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           AI-powered tools to clean up your song library
         </p>
       </div>
@@ -199,7 +199,7 @@ export default function DataHealthPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{mismatchCounts.mismatched}</p>
-                <p className="text-xs text-neutral-500">Artist mismatches</p>
+                <p className="text-xs text-muted-foreground">Artist mismatches</p>
               </div>
             </div>
           </CardContent>
@@ -212,7 +212,7 @@ export default function DataHealthPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{contentCounts.missing}</p>
-                <p className="text-xs text-neutral-500">Missing content</p>
+                <p className="text-xs text-muted-foreground">Missing content</p>
               </div>
             </div>
           </CardContent>
@@ -225,7 +225,7 @@ export default function DataHealthPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{contentCounts.incomplete}</p>
-                <p className="text-xs text-neutral-500">Incomplete content</p>
+                <p className="text-xs text-muted-foreground">Incomplete content</p>
               </div>
             </div>
           </CardContent>
@@ -252,7 +252,7 @@ export default function DataHealthPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {artistState === 'idle' && (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Scan your library to find songs where the artist might be wrong.
               AI will compare song titles against artist names.
             </p>
@@ -262,7 +262,7 @@ export default function DataHealthPage() {
               {[1, 2, 3].map((i) => (
                 <Skeleton key={i} className="h-12 w-full rounded-lg" />
               ))}
-              <p className="text-sm text-neutral-400 text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 Analyzing {mismatchCounts.total || '...'} songs with AI...
               </p>
             </div>
@@ -271,7 +271,7 @@ export default function DataHealthPage() {
             <div className="flex flex-col items-center py-8 text-center">
               <CheckCircle2 className="h-10 w-10 text-emerald-500 mb-3" />
               <p className="text-sm font-medium">No mismatches found!</p>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 All {mismatchCounts.total} songs appear to have the correct artist.
               </p>
             </div>
@@ -280,7 +280,7 @@ export default function DataHealthPage() {
             <div>
               <button
                 onClick={() => setExpandedArtist(!expandedArtist)}
-                className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3 hover:text-neutral-900 dark:hover:text-neutral-100"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3 hover:text-foreground"
               >
                 {expandedArtist ? (
                   <ChevronDown className="h-4 w-4" />
@@ -295,12 +295,12 @@ export default function DataHealthPage() {
                   {mismatches.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900"
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card"
                     >
                       <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.title}</p>
-                        <p className="text-xs text-neutral-500">
+                        <p className="text-xs text-muted-foreground">
                           Currently: <span className="text-red-500">{item.currentArtist}</span>
                           {item.suggestedArtist && (
                             <>
@@ -308,7 +308,7 @@ export default function DataHealthPage() {
                               <span className="text-emerald-500">{item.suggestedArtist}</span>
                             </>
                           )}
-                          <span className="ml-2 text-neutral-400">
+                          <span className="ml-2 text-muted-foreground">
                             ({(item.confidence * 100).toFixed(0)}% confidence)
                           </span>
                         </p>
@@ -358,7 +358,7 @@ export default function DataHealthPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {contentState === 'idle' && (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Find songs with missing or incomplete chord/lyric content.
               AI can generate new content or fill in missing sections.
             </p>
@@ -374,7 +374,7 @@ export default function DataHealthPage() {
             <div className="flex flex-col items-center py-8 text-center">
               <CheckCircle2 className="h-10 w-10 text-emerald-500 mb-3" />
               <p className="text-sm font-medium">All songs have content!</p>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 All {contentCounts.total} songs have complete chord sheets.
               </p>
             </div>
@@ -387,7 +387,7 @@ export default function DataHealthPage() {
             <div>
               <button
                 onClick={() => setExpandedMissing(!expandedMissing)}
-                className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3 hover:text-neutral-900 dark:hover:text-neutral-100"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3 hover:text-foreground"
               >
                 {expandedMissing ? (
                   <ChevronDown className="h-4 w-4" />
@@ -404,13 +404,13 @@ export default function DataHealthPage() {
                     return (
                       <div
                         key={item.id}
-                        className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 space-y-3"
+                        className="p-3 rounded-lg border border-border bg-card space-y-3"
                       >
                         <div className="flex items-center gap-3">
-                          <Music className="h-4 w-4 text-neutral-400 shrink-0" />
+                          <Music className="h-4 w-4 text-muted-foreground shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{item.title}</p>
-                            <p className="text-xs text-neutral-500">{item.artist}</p>
+                            <p className="text-xs text-muted-foreground">{item.artist}</p>
                           </div>
                           <Button
                             size="sm"
@@ -429,7 +429,7 @@ export default function DataHealthPage() {
                         </div>
                         {hasGenerated && (
                           <div className="space-y-2">
-                            <pre className="text-xs font-mono bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg max-h-48 overflow-y-auto whitespace-pre-wrap">
+                            <pre className="text-xs font-mono bg-background p-3 rounded-lg max-h-48 overflow-y-auto whitespace-pre-wrap">
                               {hasGenerated}
                             </pre>
                             <div className="flex justify-end">
@@ -457,7 +457,7 @@ export default function DataHealthPage() {
             <div>
               <button
                 onClick={() => setExpandedIncomplete(!expandedIncomplete)}
-                className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-3 hover:text-neutral-900 dark:hover:text-neutral-100"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3 hover:text-foreground"
               >
                 {expandedIncomplete ? (
                   <ChevronDown className="h-4 w-4" />
@@ -474,13 +474,13 @@ export default function DataHealthPage() {
                     return (
                       <div
                         key={item.id}
-                        className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 space-y-3"
+                        className="p-3 rounded-lg border border-border bg-card space-y-3"
                       >
                         <div className="flex items-center gap-3">
                           <AlertTriangle className="h-4 w-4 text-orange-400 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{item.title}</p>
-                            <p className="text-xs text-neutral-500">
+                            <p className="text-xs text-muted-foreground">
                               {item.artist} · {item.contentLength} chars
                             </p>
                           </div>
@@ -500,13 +500,13 @@ export default function DataHealthPage() {
                           </Button>
                         </div>
                         {!hasGenerated && item.preview && (
-                          <pre className="text-xs font-mono text-neutral-500 truncate">
+                          <pre className="text-xs font-mono text-muted-foreground truncate">
                             {item.preview}...
                           </pre>
                         )}
                         {hasGenerated && (
                           <div className="space-y-2">
-                            <pre className="text-xs font-mono bg-neutral-50 dark:bg-neutral-950 p-3 rounded-lg max-h-48 overflow-y-auto whitespace-pre-wrap">
+                            <pre className="text-xs font-mono bg-background p-3 rounded-lg max-h-48 overflow-y-auto whitespace-pre-wrap">
                               {hasGenerated}
                             </pre>
                             <div className="flex justify-end">

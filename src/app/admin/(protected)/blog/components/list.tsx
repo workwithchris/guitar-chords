@@ -55,8 +55,8 @@ export default function BlogList({ posts }: { posts: any[] }) {
                 <CardContent className="p-6">
                     {data.length === 0 ? (
                         <div className="flex flex-col items-center py-12 text-center">
-                            <FileText className="h-10 w-10 text-neutral-300 dark:text-neutral-700 mb-3" />
-                            <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">No blog posts yet</p>
+                            <FileText className="h-10 w-10 text-muted-foreground mb-3" />
+                            <p className="text-sm font-medium text-muted-foreground">No blog posts yet</p>
                             <Link href="/admin/blog/add" className="mt-4">
                                 <Button className="gap-2">
                                     <Plus className="h-4 w-4" />
@@ -79,8 +79,8 @@ export default function BlogList({ posts }: { posts: any[] }) {
                                     <TableRow key={post.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                                                    <FileText className="h-4 w-4 text-neutral-500" />
+                                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
+                                                    <FileText className="h-4 w-4 text-muted-foreground" />
                                                 </div>
                                                 <p className="font-medium">{post.title}</p>
                                             </div>
@@ -91,7 +91,7 @@ export default function BlogList({ posts }: { posts: any[] }) {
                                                 onCheckedChange={(checked) => handleToggle(post.id, checked)}
                                             />
                                         </TableCell>
-                                        <TableCell className="text-sm text-neutral-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {post.createdAt
                                                 ? new Date(post.createdAt).toLocaleDateString('en-US', {
                                                     year: 'numeric', month: 'short', day: 'numeric'

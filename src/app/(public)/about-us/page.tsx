@@ -42,10 +42,10 @@ export default function AboutUsPage() {
     return (
         <div className="space-y-16">
             <section className="space-y-6">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                     About Guitar Chords
                 </h1>
-                <div className="space-y-4 text-sm md:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                <div className="space-y-4 text-sm md:text-base text-muted-foreground leading-relaxed">
                     <p>
                         GuitarChords by Techyatraa is your destination for guitar enthusiasts. We provide a
                         vast collection of lyrics and chords to your favorite songs, making it easier for you
@@ -64,14 +64,14 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <div className="border-t border-neutral-200 dark:border-neutral-800" />
+            <div className="border-t border-border" />
 
             <section className="space-y-8">
                 <div className="text-center space-y-2">
-                    <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                    <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
                         What We Offer
                     </h2>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                    <p className="text-sm text-muted-foreground">
                         Everything you need for your guitar journey
                     </p>
                 </div>
@@ -81,16 +81,16 @@ export default function AboutUsPage() {
                         return (
                             <div
                                 key={feature.title}
-                                className="flex gap-4 p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900"
+                                className="flex gap-4 p-5 rounded-xl border border-border bg-card"
                             >
-                                <div className="h-10 w-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                                    <Icon className="h-5 w-5 text-neutral-700 dark:text-neutral-300" />
+                                <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                    <Icon className="h-5 w-5 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                                    <h3 className="font-semibold text-foreground">
                                         {feature.title}
                                     </h3>
-                                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+                                    <p className="text-sm text-muted-foreground mt-1">
                                         {feature.description}
                                     </p>
                                 </div>
@@ -100,13 +100,13 @@ export default function AboutUsPage() {
                 </div>
             </section>
 
-            <div className="border-t border-neutral-200 dark:border-neutral-800" />
+            <div className="border-t border-border" />
 
             <section className="text-center space-y-4 pb-8">
-                <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
                     Join Our Community
                 </h2>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
                     Start exploring our extensive collection, unleash your creativity, and enjoy the thrill
                     of making music with GuitarChords.
                 </p>

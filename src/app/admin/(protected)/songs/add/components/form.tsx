@@ -94,15 +94,15 @@ export default function SongForm({ initialData }: { initialData?: any }) {
             <div className="mb-8 flex items-center gap-4">
                 <Link
                     href="/admin/songs"
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-800 transition-colors"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border hover:bg-secondary dark:border-border dark:hover:bg-secondary transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4" />
                 </Link>
                 <div className="flex-1">
-                    <div className="flex items-center gap-2 text-sm text-neutral-500">
-                        <Link href="/admin/songs" className="hover:text-neutral-900 dark:hover:text-neutral-50 transition-colors">Songs</Link>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Link href="/admin/songs" className="hover:text-foreground transition-colors">Songs</Link>
                         <span>/</span>
-                        <span className="text-neutral-900 dark:text-neutral-50 font-medium">{isEditing ? initialData.title : 'New Song'}</span>
+                        <span className="text-foreground font-medium">{isEditing ? initialData.title : 'New Song'}</span>
                     </div>
                 </div>
                 <div className="flex gap-3">
@@ -118,13 +118,13 @@ export default function SongForm({ initialData }: { initialData?: any }) {
             <div className="space-y-8">
                 <Card>
                     <CardContent className="p-8 space-y-8">
-                        <div className="flex items-center gap-3 pb-1 border-b border-neutral-100 dark:border-neutral-800">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                                <ArrowUpDown className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+                        <div className="flex items-center gap-3 pb-1 border-b border-border">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+                                <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
                             </div>
                             <div>
                                 <h2 className="text-base font-semibold">Song Details</h2>
-                                <p className="text-sm text-neutral-500">Basic information and musical properties</p>
+                                <p className="text-sm text-muted-foreground">Basic information and musical properties</p>
                             </div>
                         </div>
 
@@ -142,8 +142,8 @@ export default function SongForm({ initialData }: { initialData?: any }) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="slug">Slug</Label>
-                                <Input id="slug" disabled value={watch("slug")} className="h-11 bg-neutral-50 dark:bg-neutral-900 text-neutral-500" />
-                                <p className="text-xs text-neutral-400">Auto-generated from title</p>
+                                <Input id="slug" disabled value={watch("slug")} className="h-11 bg-background dark:bg-secondary text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">Auto-generated from title</p>
                             </div>
                         </div>
 
@@ -234,7 +234,7 @@ export default function SongForm({ initialData }: { initialData?: any }) {
                                 placeholder="https://..."
                                 className="h-11"
                             />
-                            <p className="text-xs text-neutral-400">URL to album cover image (500x500 recommended)</p>
+                            <p className="text-xs text-muted-foreground">URL to album cover image (500x500 recommended)</p>
                         </div>
 
                         <div className="space-y-2">
@@ -245,27 +245,27 @@ export default function SongForm({ initialData }: { initialData?: any }) {
                                 placeholder="https://www.youtube.com/embed/..."
                                 className="h-11"
                             />
-                            <p className="text-xs text-neutral-400">Paste the embed URL from YouTube or other video platforms</p>
+                            <p className="text-xs text-muted-foreground">Paste the embed URL from YouTube or other video platforms</p>
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardContent className="p-8 space-y-6">
-                        <div className="flex items-center gap-3 pb-1 border-b border-neutral-100 dark:border-neutral-800">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                                <span className="text-sm font-bold text-neutral-600 dark:text-neutral-400">♪</span>
+                        <div className="flex items-center gap-3 pb-1 border-b border-border">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+                                <span className="text-sm font-bold text-muted-foreground">♪</span>
                             </div>
                             <div>
                                 <h2 className="text-base font-semibold">Lyrics & Chords</h2>
-                                <p className="text-sm text-neutral-500">Write the full song with chord notations</p>
+                                <p className="text-sm text-muted-foreground">Write the full song with chord notations</p>
                             </div>
                         </div>
                         <TextEditor editorValues={watch("content") ?? ""} getEditorValues={(val) => setValue("content", val)} />
-                        <p className="text-xs text-neutral-400">
-                            Use square brackets for chords: <code className="rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-neutral-600 dark:text-neutral-400">[G]</code>{' '}
-                            <code className="rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-neutral-600 dark:text-neutral-400">[C]</code>{' '}
-                            <code className="rounded bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 text-neutral-600 dark:text-neutral-400">[D]</code>
+                        <p className="text-xs text-muted-foreground">
+                            Use square brackets for chords: <code className="rounded bg-secondary px-1 py-0.5 text-muted-foreground">[G]</code>{' '}
+                            <code className="rounded bg-secondary px-1 py-0.5 text-muted-foreground">[C]</code>{' '}
+                            <code className="rounded bg-secondary px-1 py-0.5 text-muted-foreground">[D]</code>
                         </p>
                     </CardContent>
                 </Card>

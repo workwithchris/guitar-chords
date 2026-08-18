@@ -61,7 +61,7 @@ export default function ChordPopoverContainer({
 
   const tip = (
     <div
-      className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full mt-[-12px] px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg"
+      className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full mt-[-12px] px-3 py-2 rounded-xl border border-border bg-card shadow-lg"
       style={{ left: popover.x, top: popover.y - 12 }}
     >
       <ChordDiagram chord={popover.chord} capo={capo} size={96} />

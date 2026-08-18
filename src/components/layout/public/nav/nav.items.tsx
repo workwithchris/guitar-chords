@@ -26,8 +26,8 @@ export const NavItems = () => {
             href={link.href}
             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors inline-flex items-center gap-1.5 ${
               isActive
-                ? "bg-neutral-200/70 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
-                : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
+                ? "bg-muted/70 text-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             }`}
           >
             {Icon && <Icon className="h-3.5 w-3.5" />}

@@ -4,48 +4,48 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    --background: 40 33% 99%;
+    --foreground: 24 10% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 24 10% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 24 10% 10%;
+    --primary: 24 10% 10%;
+    --primary-foreground: 40 33% 99%;
+    --secondary: 35 25% 96%;
+    --secondary-foreground: 24 10% 10%;
+    --muted: 35 20% 95%;
+    --muted-foreground: 25 5% 45%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 24 10% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
+    --border: 30 12% 90%;
+    --input: 30 12% 88%;
+    --ring: 38 92% 50%;
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 98%;
+    --background: 24 10% 6%;
+    --foreground: 40 20% 97%;
+    --card: 24 8% 8%;
+    --card-foreground: 40 20% 97%;
+    --popover: 24 8% 8%;
+    --popover-foreground: 40 20% 97%;
+    --primary: 40 20% 97%;
+    --primary-foreground: 24 10% 10%;
+    --secondary: 25 8% 14%;
+    --secondary-foreground: 40 20% 97%;
+    --muted: 25 8% 14%;
+    --muted-foreground: 30 5% 64%;
+    --accent: 38 92% 55%;
+    --accent-foreground: 24 10% 10%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
-    --ring: 0 0% 83%;
+    --border: 25 8% 15%;
+    --input: 25 8% 15%;
+    --ring: 38 92% 55%;
   }
 }
 
@@ -85,23 +85,25 @@
 
 .chord-pop {
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-weight: 600;
-  color: hsl(var(--foreground));
+  font-weight: 700;
+  color: hsl(var(--accent));
   cursor: pointer;
-  padding: 0 1px;
-  border-radius: 4px;
-  background: hsl(var(--secondary));
+  padding: 0 4px 1px;
+  border-radius: 5px;
+  background: hsl(var(--accent) / 0.12);
   transition: background 120ms ease, color 120ms ease;
 }
 .chord-pop:hover {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }
 
+/* Songbook-style sheet: serif lyrics, mono accent-pill chords above */
 .chords-lyrics {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: Georgia, 'Times New Roman', Times, serif;
   white-space: pre-wrap;
-  line-height: 1.9;
+  line-height: 2;
+  color: hsl(var(--foreground));
 }
 .chords-lyrics p {
   margin-bottom: 0.25rem;
@@ -113,7 +115,7 @@
 
 .chords-lyrics .lyric-line {
   display: block;
-  line-height: 2.4;
+  line-height: 2.6;
   margin-bottom: 0.1rem;
 }
 .chords-lyrics .seg {
@@ -124,14 +126,22 @@
 }
 .chords-lyrics .seg .chord {
   position: absolute;
-  top: -1.05em;
+  top: -1.35em;
   left: 0;
-  font-size: 0.8em;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.78em;
   font-weight: 700;
-  color: hsl(var(--primary));
+  letter-spacing: 0.03em;
+  color: hsl(var(--accent));
+  background: hsl(var(--accent) / 0.12);
+  border-radius: 5px;
+  padding: 0 4px 1px;
   cursor: pointer;
   white-space: nowrap;
-  padding: 0 1px;
+}
+.chords-lyrics .seg .chord:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
 }
 .chords-lyrics .seg .lyric {
   display: inline-block;
@@ -139,13 +149,15 @@
 }
 .chords-lyrics .lyric-section {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 600;
-  margin-top: 1.4rem;
-  margin-bottom: 0.4rem;
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.8em;
-  color: hsl(var(--muted-foreground));
+  letter-spacing: 0.08em;
+  font-size: 0.72em;
+  color: hsl(var(--accent));
+  padding-left: 0.75rem;
+  border-left: 3px solid hsl(var(--accent));
 }
 
 .scroll-progress {

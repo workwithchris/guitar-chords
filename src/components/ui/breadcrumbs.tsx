@@ -10,9 +10,9 @@ export interface Crumb {
 export default function Breadcrumbs({ items }: { items: Crumb[] }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-6 no-print">
-      <ol className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
+      <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <li>
-          <Link href="/" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+          <Link href="/" className="hover:text-foreground transition-colors">
             <Home className="h-3.5 w-3.5" />
             <span className="sr-only">Home</span>
           </Link>
@@ -23,12 +23,12 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
             {item.href ? (
               <Link
                 href={item.href}
-                className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                className="hover:text-foreground transition-colors"
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="text-neutral-900 dark:text-neutral-100 font-medium truncate max-w-[200px]">
+              <span className="text-foreground font-medium truncate max-w-[200px]">
                 {item.label}
               </span>
             )}

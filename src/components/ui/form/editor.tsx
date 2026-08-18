@@ -141,19 +141,19 @@ export default function TextEditor({ editorValues, getEditorValues, className, d
       onBlur={() => setFocused(false)}
       className={cn(
         "quill-wrapper rounded-xl transition-all duration-200",
-        focused && "ring-1 ring-neutral-400 dark:ring-neutral-500",
+        focused && "ring-1 ring-ring",
         className
       )}
     >
       {!ready ? (
-        <div className="flex min-h-[300px] items-center justify-center gap-2 rounded-xl border border-neutral-200 text-sm text-neutral-400 dark:border-neutral-800">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-300 border-t-neutral-600" />
+        <div className="flex min-h-[300px] items-center justify-center gap-2 rounded-xl border border-border text-sm text-muted-foreground dark:border-border">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
           Loading editor...
         </div>
       ) : (
         <>
-          <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 rounded-t-xl">
-            <span className="text-xs font-medium text-neutral-400 dark:text-neutral-500 mr-1">Chords</span>
+          <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 border-b border-border bg-background dark:bg-secondary rounded-t-xl">
+            <span className="text-xs font-medium text-muted-foreground mr-1">Chords</span>
             {QUICK_CHORDS.map((chord) => (
               <button
                 key={chord}

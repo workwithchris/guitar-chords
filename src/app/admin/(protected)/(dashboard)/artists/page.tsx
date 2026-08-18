@@ -19,7 +19,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Artists</h1>
-                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    <p className="mt-1 text-sm text-muted-foreground">
                         Manage your artists collection
                     </p>
                 </div>

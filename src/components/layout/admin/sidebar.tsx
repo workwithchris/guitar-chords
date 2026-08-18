@@ -34,11 +34,11 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
               isActive
-                ? "bg-neutral-800 text-white dark:bg-neutral-700 shadow-sm"
-                : "text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200"
+                ? "bg-foreground text-background shadow-sm"
+                : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
             )}
           >
-            <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-white")} />
+            <item.icon className={cn("h-4 w-4 shrink-0", isActive && "text-background")} />
             {item.label}
           </Link>
         )
@@ -52,24 +52,24 @@ function SidebarContent() {
   const { signOut }: any = useAuthStore()
 
   return (
-    <div className="flex h-full flex-col bg-neutral-950 dark:bg-neutral-900">
-      <div className="flex h-14 items-center border-b border-neutral-800 px-6">
+    <div className="flex h-full flex-col bg-background dark:bg-secondary">
+      <div className="flex h-14 items-center border-b border-border px-6">
         <Link href="/admin" className="flex items-center gap-2.5 group">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white group-hover:bg-neutral-100 transition-colors">
-            <span className="text-xs font-bold text-neutral-950">GC</span>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card group-hover:bg-secondary transition-colors">
+            <span className="text-xs font-bold text-foreground">GC</span>
           </div>
-          <span className="font-semibold text-white">Guitar Chords</span>
+          <span className="font-semibold text-foreground">Guitar Chords</span>
         </Link>
       </div>
       <NavLinks />
-      <div className="border-t border-neutral-800 p-4 space-y-3">
+      <div className="border-t border-border p-4 space-y-3">
         <div className="flex items-center justify-between px-1">
-          <span className="text-xs text-neutral-600">Theme</span>
+          <span className="text-xs text-muted-foreground">Theme</span>
           <ModeToggle />
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+          className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground hover:bg-secondary/50"
           onClick={() => {
             signOut().then(() => router.push("/admin/login"))
           }}

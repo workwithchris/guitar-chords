@@ -38,14 +38,14 @@ export default async function ArtistsPage({ searchParams }: { searchParams: Prom
             {prevPage && <link rel="prev" href={`${baseUrl}/artists?page=${prevPage}${letter ? `&letter=${letter}` : ''}${search ? `&q=${search}` : ''}`} />}
             {nextPage && <link rel="next" href={`${baseUrl}/artists?page=${nextPage}${letter ? `&letter=${letter}` : ''}${search ? `&q=${search}` : ''}`} />}
             <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                     All Artists
                 </h1>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                     {result.totalCount} {result.totalCount === 1 ? 'artist' : 'artists'} in the collection
                 </p>
             </div>
-            <div className="border-t border-neutral-200 dark:border-neutral-800" />
+            <div className="border-t border-border" />
             <Suspense>
                 <ArtistsList
                     artists={result.data as any}

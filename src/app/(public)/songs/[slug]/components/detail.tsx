@@ -266,7 +266,7 @@ const SongDetail = ({ data }: any) => {
   const VideoDockedPlaceholder = () => (
     <button
       onClick={() => setVideoFloating(false)}
-      className="aspect-video w-full rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 flex flex-col items-center justify-center gap-2 text-neutral-400 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors"
+      className="aspect-video w-full rounded-2xl border border-dashed border-border bg-secondary/50 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
     >
       <PictureInPicture2 className="h-6 w-6" />
       <span className="text-xs font-medium">Playing in floating player — click to dock back</span>
@@ -296,7 +296,7 @@ const SongDetail = ({ data }: any) => {
       >
         <Link
           href="/songs"
-          className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to songs
@@ -322,7 +322,7 @@ const SongDetail = ({ data }: any) => {
                     width={280}
                     height={280}
                     alt={`${song?.title ?? ''} album art`}
-                    className="rounded-2xl object-cover shadow-xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                    className="rounded-2xl object-cover shadow-xl ring-1 ring-border/50"
                     priority
                   />
                 </motion.div>
@@ -333,14 +333,14 @@ const SongDetail = ({ data }: any) => {
                   width={280}
                   height={280}
                   alt={artist?.name ?? ''}
-                  className="rounded-2xl object-cover shadow-xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                  className="rounded-2xl object-cover shadow-xl ring-1 ring-border/50"
                   priority
                 />
               )}
             </div>
           ) : (
-            <div className="h-[280px] w-[280px] rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-              <Music className="h-14 w-14 text-neutral-400" />
+            <div className="h-[280px] w-[280px] rounded-2xl bg-secondary flex items-center justify-center">
+              <Music className="h-14 w-14 text-muted-foreground" />
             </div>
           )}
         </motion.div>
@@ -353,12 +353,12 @@ const SongDetail = ({ data }: any) => {
             className="space-y-3"
           >
             <div className="space-y-1.5">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 leading-[1.08]">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-[1.08]">
                 {song?.title}
               </h1>
               <Link
                 href={`/artists/${artist?.slug}`}
-                className="inline-flex items-center gap-1.5 text-lg text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                className="inline-flex items-center gap-1.5 text-lg text-muted-foreground hover:text-foreground transition-colors"
               >
                 <User className="h-4 w-4" />
                 {artist?.name}
@@ -366,7 +366,7 @@ const SongDetail = ({ data }: any) => {
             </div>
 
             {(song?.year || song?.writtenBy) && (
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-neutral-500 dark:text-neutral-400">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
                 {song?.year && (
                   <span className="inline-flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5" />
@@ -388,7 +388,7 @@ const SongDetail = ({ data }: any) => {
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={togglePlayback}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900 text-sm font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-sm font-semibold hover:bg-foreground/90 transition-colors shadow-sm"
               >
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                 {isPlaying ? 'Pause' : 'Auto-scroll'}
@@ -401,13 +401,13 @@ const SongDetail = ({ data }: any) => {
                   id: song.id, slug: song.slug, title: song.title,
                   artistName: artist?.name ?? '', artistSlug: artist?.slug ?? '',
                 })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-200 dark:border-neutral-800 text-sm font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-sm font-medium transition-colors hover:bg-secondary hover:border-border"
               >
                 <motion.div
                   animate={fav ? { scale: [1, 1.3, 1] } : {}}
                   transition={{ duration: 0.3 }}
                 >
-                  <Heart className={`h-4 w-4 ${fav ? 'fill-red-500 text-red-500' : 'text-neutral-700 dark:text-neutral-300'}`} />
+                  <Heart className={`h-4 w-4 ${fav ? 'fill-red-500 text-red-500' : 'text-foreground'}`} />
                 </motion.div>
                 {fav ? 'Saved' : 'Save'}
               </motion.button>
@@ -416,7 +416,7 @@ const SongDetail = ({ data }: any) => {
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 onClick={() => setShowShare(!showShare)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-border text-foreground text-sm font-medium transition-colors hover:bg-secondary hover:border-border"
               >
                 <Share2 className="h-4 w-4" />
                 Share
@@ -427,7 +427,7 @@ const SongDetail = ({ data }: any) => {
                 whileTap={{ scale: 0.96 }}
                 onClick={handlePrint}
                 aria-label="Print"
-                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-border text-foreground transition-colors hover:bg-secondary hover:border-border"
               >
                 <Printer className="h-4 w-4" />
               </motion.button>
@@ -437,7 +437,7 @@ const SongDetail = ({ data }: any) => {
                 whileTap={{ scale: 0.96 }}
                 onClick={handleCopyChords}
                 aria-label="Copy chords"
-                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-border text-foreground transition-colors hover:bg-secondary hover:border-border"
               >
                 <Copy className="h-4 w-4" />
               </motion.button>
@@ -462,7 +462,7 @@ const SongDetail = ({ data }: any) => {
             {displayKey && (
               <motion.span
                 variants={itemVar}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-xs font-semibold text-foreground"
               >
                 <Music className="h-3 w-3" />
                 {displayKey}
@@ -471,7 +471,7 @@ const SongDetail = ({ data }: any) => {
             {capo > 0 && (
               <motion.span
                 variants={itemVar}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-xs font-semibold text-foreground"
               >
                 Capo {capo}
               </motion.span>
@@ -479,7 +479,7 @@ const SongDetail = ({ data }: any) => {
             {song?.tuning && song.tuning !== 'EADGBE' && (
               <motion.span
                 variants={itemVar}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-xs font-semibold text-foreground"
               >
                 {song.tuning}
               </motion.span>
@@ -487,7 +487,7 @@ const SongDetail = ({ data }: any) => {
             {song?.difficulty && (
               <motion.span
                 variants={itemVar}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-xs font-semibold text-foreground"
               >
                 {song.difficulty}
               </motion.span>
@@ -495,7 +495,7 @@ const SongDetail = ({ data }: any) => {
             {song?.genre && (
               <motion.span
                 variants={itemVar}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-xs font-semibold text-foreground"
               >
                 {song.genre}
               </motion.span>
@@ -512,7 +512,7 @@ const SongDetail = ({ data }: any) => {
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                   Video
                 </h2>
                 {!videoFloating && (
@@ -520,7 +520,7 @@ const SongDetail = ({ data }: any) => {
                     onClick={() => setVideoFloating(true)}
                     aria-label="Pop out video"
                     title="Pop out video"
-                    className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <PictureInPicture2 className="h-3.5 w-3.5" />
                   </button>
@@ -529,7 +529,7 @@ const SongDetail = ({ data }: any) => {
               {videoFloating ? (
                 <VideoDockedPlaceholder />
               ) : (
-                <div className="aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-neutral-200/50 dark:ring-neutral-800/50">
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-border/50">
                   {renderVideoEmbed('w-full h-full')}
                 </div>
               )}
@@ -543,7 +543,7 @@ const SongDetail = ({ data }: any) => {
           <SectionReveal>
             <div className="space-y-4 no-print">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                   Video
                 </h2>
                 {!videoFloating && (
@@ -551,7 +551,7 @@ const SongDetail = ({ data }: any) => {
                     onClick={() => setVideoFloating(true)}
                     aria-label="Pop out video"
                     title="Pop out video"
-                    className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                   >
                     <PictureInPicture2 className="h-3.5 w-3.5" />
                   </button>
@@ -571,7 +571,7 @@ const SongDetail = ({ data }: any) => {
                 ) : (
                   <motion.div
                     whileHover={{ scale: 1.005 }}
-                    className="relative w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-neutral-200/50 dark:ring-neutral-800/50"
+                    className="relative w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-md ring-1 ring-border/50"
                   >
                     {renderVideoEmbed('absolute inset-0 w-full h-full')}
                   </motion.div>
@@ -583,9 +583,9 @@ const SongDetail = ({ data }: any) => {
       )}
 
       <SectionReveal>
-        <div className="flex flex-wrap items-center gap-2 p-3.5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm no-print">
+        <div className="flex flex-wrap items-center gap-2 p-3.5 rounded-2xl bg-card border border-border shadow-sm no-print">
           <div className="flex items-center gap-1.5 mr-2">
-            <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Scroll</span>
+            <span className="text-xs font-medium text-muted-foreground">Scroll</span>
             {SPEED_OPTIONS.map((speed) => (
               <motion.button
                 key={speed}
@@ -593,8 +593,8 @@ const SongDetail = ({ data }: any) => {
                 onClick={() => setScrollSpeed(speed)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                   scrollSpeed === speed
-                    ? 'bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    ? 'bg-foreground text-background'
+                    : 'text-muted-foreground hover:bg-secondary'
                 }`}
               >
                 {speed}x
@@ -602,33 +602,33 @@ const SongDetail = ({ data }: any) => {
             ))}
           </div>
 
-          <span className="h-5 w-px bg-neutral-200 dark:bg-neutral-700" />
+          <span className="h-5 w-px bg-border" />
 
-          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 ml-1">Key</span>
+          <span className="text-xs font-medium text-muted-foreground ml-1">Key</span>
           <div className="flex items-center gap-0.5">
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={handleTransposeDown}
-              className="p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1 rounded-md hover:bg-secondary transition-colors"
               aria-label="Transpose down"
             >
-              <ChevronDown className="h-4 w-4 text-neutral-700 dark:text-neutral-300" />
+              <ChevronDown className="h-4 w-4 text-foreground" />
             </motion.button>
             <motion.span
               key={effectiveTranspose}
               initial={{ y: -6, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="text-sm font-mono font-bold text-neutral-900 dark:text-neutral-100 w-8 text-center tabular-nums"
+              className="text-sm font-mono font-bold text-foreground w-8 text-center tabular-nums"
             >
               {effectiveTranspose === 0 ? '0' : effectiveTranspose > 0 ? `+${effectiveTranspose}` : effectiveTranspose}
             </motion.span>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={handleTransposeUp}
-              className="p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1 rounded-md hover:bg-secondary transition-colors"
               aria-label="Transpose up"
             >
-              <ChevronUp className="h-4 w-4 text-neutral-700 dark:text-neutral-300" />
+              <ChevronUp className="h-4 w-4 text-foreground" />
             </motion.button>
           </div>
           {transpose !== 0 && (
@@ -637,13 +637,13 @@ const SongDetail = ({ data }: any) => {
               animate={{ opacity: 1, scale: 1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setTranspose(0)}
-              className="ml-0.5 px-2 py-1 text-xs rounded-lg text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="ml-0.5 px-2 py-1 text-xs rounded-lg text-muted-foreground hover:bg-secondary transition-colors"
             >
               Reset
             </motion.button>
           )}
 
-          <span className="h-5 w-px bg-neutral-200 dark:bg-neutral-700 ml-1" />
+          <span className="h-5 w-px bg-border ml-1" />
 
           {capo > 0 && (
             <>
@@ -652,13 +652,13 @@ const SongDetail = ({ data }: any) => {
                 onClick={() => setConcertPitch((v) => !v)}
                 className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-colors ${
                   concertPitch
-                    ? 'border-neutral-900 dark:border-neutral-100 bg-neutral-900 dark:bg-neutral-100 text-neutral-50 dark:text-neutral-900'
-                    : 'border-transparent text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    ? 'border-foreground bg-foreground text-background'
+                    : 'border-transparent text-muted-foreground hover:bg-secondary'
                 }`}
               >
                 {concertPitch ? 'Concert' : 'As played'}
               </motion.button>
-              <span className="h-5 w-px bg-neutral-200 dark:bg-neutral-700" />
+              <span className="h-5 w-px bg-border" />
             </>
           )}
 
@@ -667,32 +667,32 @@ const SongDetail = ({ data }: any) => {
             onClick={() => setUseFlats((v) => !v)}
             className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
               useFlats
-                ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100'
-                : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                ? 'bg-secondary text-foreground'
+                : 'text-muted-foreground hover:bg-secondary'
             }`}
           >
             {useFlats ? '♭' : '♯'}
           </motion.button>
 
-          <span className="h-5 w-px bg-neutral-200 dark:bg-neutral-700" />
+          <span className="h-5 w-px bg-border" />
 
           <div className="flex items-center gap-1 ml-auto">
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={decreaseFont}
-              className="p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1 rounded-md hover:bg-secondary transition-colors"
               aria-label="Decrease font size"
             >
-              <Minus className="h-3.5 w-3.5 text-neutral-700 dark:text-neutral-300" />
+              <Minus className="h-3.5 w-3.5 text-foreground" />
             </motion.button>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400 w-6 text-center font-medium tabular-nums">{fontSize}</span>
+            <span className="text-xs text-muted-foreground w-6 text-center font-medium tabular-nums">{fontSize}</span>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={increaseFont}
-              className="p-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-1 rounded-md hover:bg-secondary transition-colors"
               aria-label="Increase font size"
             >
-              <Plus className="h-3.5 w-3.5 text-neutral-700 dark:text-neutral-300" />
+              <Plus className="h-3.5 w-3.5 text-foreground" />
             </motion.button>
           </div>
         </div>
@@ -701,10 +701,10 @@ const SongDetail = ({ data }: any) => {
       {contentChords.length > 0 && (
         <SectionReveal>
           <div>
-            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
               Chord Diagrams
             </h2>
-            <div className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <div className="p-5 rounded-2xl bg-card border border-border shadow-sm">
               <ChordDiagramList chords={contentChords} capo={concertPitch ? 0 : capo} />
             </div>
           </div>
@@ -713,13 +713,13 @@ const SongDetail = ({ data }: any) => {
 
       <SectionReveal>
         <div ref={lyricsRef}>
-          <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
             Chords & Lyrics
           </h2>
-          <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="p-6 md:p-8 rounded-2xl bg-card border border-border shadow-sm">
             {legacyHtml ? (
               <div
-                className="chords-lyrics prose prose-neutral dark:prose-invert max-w-none"
+                className="chords-lyrics prose prose-stone dark:prose-invert max-w-none"
                 style={{ fontSize: `${fontSize}px` }}
                 dangerouslySetInnerHTML={{ __html: wrapChords(song?.content ?? '', effectiveTranspose, useFlats) }}
               />
@@ -740,8 +740,8 @@ const SongDetail = ({ data }: any) => {
       {sameKeySongs.length > 0 && (
         <SectionReveal>
           <div className="space-y-4">
-            <div className="border-t border-neutral-200 dark:border-neutral-800" />
-            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+            <div className="border-t border-border" />
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               More in {song?.key}
             </h2>
             <motion.div
@@ -761,18 +761,18 @@ const SongDetail = ({ data }: any) => {
                 >
                   <Link
                     href={`/songs/${r.slug}`}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all group"
+                    className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:border-border hover:shadow-sm transition-all group"
                   >
                     {r.image ? (
                       <Image src={r.image} width={36} height={36} alt="" className="rounded-lg object-cover shrink-0" />
                     ) : (
-                      <div className="h-9 w-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                        <Music className="h-4 w-4 text-neutral-500" />
+                      <div className="h-9 w-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                        <Music className="h-4 w-4 text-muted-foreground" />
                       </div>
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">{r.title}</p>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{r.artist?.name}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{r.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{r.artist?.name}</p>
                     </div>
                   </Link>
                 </motion.div>
@@ -785,8 +785,8 @@ const SongDetail = ({ data }: any) => {
       {related.length > 0 && (
         <SectionReveal>
           <div className="space-y-4">
-            <div className="border-t border-neutral-200 dark:border-neutral-800" />
-            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+            <div className="border-t border-border" />
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Related Songs
             </h2>
             <motion.div
@@ -806,20 +806,20 @@ const SongDetail = ({ data }: any) => {
                 >
                   <Link
                     href={`/songs/${r.slug}`}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all group"
+                    className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:border-border hover:shadow-sm transition-all group"
                   >
                     {r.image ? (
                       <Image src={r.image} width={36} height={36} alt="" className="rounded-lg object-cover shrink-0" />
                     ) : (
-                      <div className="h-9 w-9 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                        <Music className="h-4 w-4 text-neutral-500" />
+                      <div className="h-9 w-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                        <Music className="h-4 w-4 text-muted-foreground" />
                       </div>
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {r.title}
                       </p>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{r.artist?.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{r.artist?.name}</p>
                     </div>
                   </Link>
                 </motion.div>
@@ -836,12 +836,12 @@ const SongDetail = ({ data }: any) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.92 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className={`fixed bottom-4 right-4 z-50 no-print rounded-2xl overflow-hidden shadow-2xl ring-1 ring-neutral-200/50 dark:ring-neutral-800/50 bg-white dark:bg-neutral-900 ${
+            className={`fixed bottom-4 right-4 z-50 no-print rounded-2xl overflow-hidden shadow-2xl ring-1 ring-border/50 bg-card ${
               videoMinimized ? 'w-56' : 'w-[calc(100vw-2rem)] sm:w-96'
             }`}
           >
-            <div className="flex items-center justify-between gap-2 px-3 py-2 bg-neutral-900 dark:bg-neutral-800">
-              <span className="text-xs font-medium text-neutral-200 truncate">{song?.title}</span>
+            <div className="flex items-center justify-between gap-2 px-3 py-2 bg-foreground dark:bg-secondary">
+              <span className="text-xs font-medium text-background dark:text-foreground truncate">{song?.title}</span>
               <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => setVideoMinimized((v) => !v)}
@@ -849,7 +849,7 @@ const SongDetail = ({ data }: any) => {
                   title={videoMinimized ? 'Expand' : 'Minimize'}
                   className="p-1 rounded-md hover:bg-white/10 transition-colors"
                 >
-                  {videoMinimized ? <Maximize2 className="h-3.5 w-3.5 text-neutral-300" /> : <Minimize2 className="h-3.5 w-3.5 text-neutral-300" />}
+                  {videoMinimized ? <Maximize2 className="h-3.5 w-3.5 text-background dark:text-foreground" /> : <Minimize2 className="h-3.5 w-3.5 text-background dark:text-foreground" />}
                 </button>
                 <button
                   onClick={() => setVideoFloating(false)}
@@ -857,7 +857,7 @@ const SongDetail = ({ data }: any) => {
                   title="Dock back"
                   className="p-1 rounded-md hover:bg-white/10 transition-colors"
                 >
-                  <X className="h-3.5 w-3.5 text-neutral-300" />
+                  <X className="h-3.5 w-3.5 text-background dark:text-foreground" />
                 </button>
               </div>
             </div>

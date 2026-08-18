@@ -6,7 +6,7 @@ export default function AddBlogPostPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">New Blog Post</h1>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                     Create a new blog post or lesson
                 </p>
             </div>

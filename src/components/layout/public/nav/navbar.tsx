@@ -8,14 +8,14 @@ import { Music } from 'lucide-react'
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-neutral-200/60 dark:border-neutral-800/60 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-neutral-950/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="m-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-2 shrink-0">
             <MobileNav />
             <Link href="/" className="flex items-center gap-2">
-              <Music className="h-5 w-5 text-neutral-800 dark:text-neutral-200" />
-              <span className="text-base md:text-lg font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+              <Music className="h-5 w-5 text-foreground" />
+              <span className="text-base md:text-lg font-semibold tracking-tight text-foreground">
                 Guitar Chords
               </span>
             </Link>

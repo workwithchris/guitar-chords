@@ -22,7 +22,7 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Songs</h1>
-                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    <p className="mt-1 text-sm text-muted-foreground">
                         Manage your songs collection
                     </p>
                 </div>
