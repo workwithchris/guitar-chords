@@ -27,7 +27,7 @@ export default function Loading() {
                         <div
                             key={i}
                             className="h-4 bg-secondary/50 rounded"
-                            style={{ width: `${60 + Math.random() * 40}%` }}
+                            style={{ width: `${60 + (i % 5) * 10}%` }}
                         />
                     ))}
                 </div>

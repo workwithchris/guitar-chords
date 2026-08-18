@@ -3,7 +3,10 @@ import type { Metadata } from 'next'
 import { getHomeStats, getRecentSongs, getFeaturedArtist, getDistinctGenres, getTrendingSongs, getKeysWithSongCount } from '@/store/api/song.server'
 import HomeClient from './components/home-client'
 
-export const revalidate = 60
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 
 export const metadata: Metadata = {
   title: 'Free Chords & Lyrics',

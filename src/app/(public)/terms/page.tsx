@@ -2,6 +2,10 @@ import React from 'react'
 import type { Metadata } from 'next'
 import Breadcrumbs from '@/components/ui/breadcrumbs'
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
 
 export const metadata: Metadata = {
@@ -26,7 +30,7 @@ export default function TermsPage() {
       </h1>
 
       <div className="prose prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed space-y-4 text-muted-foreground">
-        <p>Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        <p>Last updated: August 18, 2026</p>
 
         <h2 className="text-lg font-semibold text-foreground">Use of Service</h2>
         <p>

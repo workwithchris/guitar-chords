@@ -4,7 +4,10 @@ import ChordDiagram from '@/components/ui/chord-diagram'
 import Breadcrumbs from '@/components/ui/breadcrumbs'
 import { WebSiteJsonLd } from '@/components/ui/json-ld'
 
-export const revalidate = 86400
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 
 const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
 

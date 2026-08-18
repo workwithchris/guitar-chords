@@ -3,7 +3,10 @@ import BlogForm from '../../components/form'
 import { fetchBlogPostById } from '@/store/api/blog.api'
 import { notFound } from 'next/navigation'
 
-export const revalidate = 0
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 
 export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params

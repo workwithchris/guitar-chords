@@ -3,6 +3,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Music, Mail, ArrowRight } from 'lucide-react'
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
 
 export const metadata: Metadata = {

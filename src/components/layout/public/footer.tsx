@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import FooterYear from './footer-year';
 
 const footerLinks = [
     { href: '/songs', label: 'Songs' },
@@ -17,7 +18,6 @@ const legalLinks = [
 ]
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear();
     return (
         <footer className="border-t border-border bg-card">
             <div className="m-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 py-10">
@@ -43,7 +43,7 @@ export default function Footer() {
                                 {link.label}
                             </Link>
                         ))}
-                        <span>&copy; {currentYear} TechYatraa. All rights reserved.</span>
+                        <FooterYear />
                     </div>
                 </div>
             </div>

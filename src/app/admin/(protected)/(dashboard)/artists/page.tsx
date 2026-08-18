@@ -3,7 +3,10 @@ import ArtistsList from './components/list';
 import { searchArtistsAdmin } from '@/store/api/song.server';
 import AddArtist from './components/add.drawer';
 
-export const revalidate = 0;
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 
 export default async function ArtistsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
     const sp = await searchParams

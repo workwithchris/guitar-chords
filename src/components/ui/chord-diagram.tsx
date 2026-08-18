@@ -251,9 +251,9 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
 
           {shape.barre && (
             <rect
-              x={PADDING + (5 - shape.barre.fromString) * STRING_SPACING - 7}
+              x={PADDING + (6 - shape.barre.toString) * STRING_SPACING - 7}
               y={PADDING + (shape.barre.fret - startFret + 1) * FRET_SPACING - FRET_SPACING / 2 - 7}
-              width={(shape.barre.toString - shape.barre.fromString) * STRING_SPACING + 14}
+              width={(shape.barre.toString - shape.barre.fromString + 1) * STRING_SPACING + 14}
               height={14}
               rx={7}
               className="fill-foreground"
@@ -261,7 +261,7 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
           )}
 
           {shape.positions.map((pos) => {
-            const cx = PADDING + (5 - pos.string) * STRING_SPACING
+            const cx = PADDING + (6 - pos.string) * STRING_SPACING
             const cy = PADDING + (pos.fret - startFret + 1) * FRET_SPACING - FRET_SPACING / 2
 
             if (pos.fret === -1) {

@@ -4,7 +4,10 @@ import type { Metadata } from 'next'
 import { fetchActiveSongsServer as fetchActiveSongs } from '@/store/api/song.server'
 import SearchClient from './components/search-client'
 
-export const revalidate = 0
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 
 const baseUrl = process.env.NEXT_PUBLIC_SHARE_BASE_URL ?? 'https://guitarchords.techyatraa.com'
 
