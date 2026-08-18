@@ -1,6 +1,8 @@
 # next-chords — AGENTS.md
 
-Guitar chords site (guitarchords.techyatraa.com). Next.js 16 App Router, Supabase (client-side), Zustand, shadcn/ui, Tailwind.
+Guitar chords site (guitarchords.techyatraa.com). Next.js 16 App Router, Supabase, Zustand, shadcn/ui, Tailwind.
+
+Note: `package.json` name is `next-supabase-prisma` — stale. No Prisma in this repo.
 
 ## Setup
 
@@ -10,58 +12,55 @@ npm run dev        # http://localhost:3000 (Turbopack default)
 npm run build      # next build (Turbopack default, --webpack to opt out)
 npm run start      # next start
 npm run lint       # eslint . (flat config via eslint.config.mjs)
+npm run typecheck  # tsc --noEmit
 ```
 
-Requires Node.js 20.9+. Uses `eslint.config.mjs` (flat config).
-
-No test framework, no CI. Typecheck via `npm run typecheck`.
+Next.js 16 requires Node.js 20.9+. `next lint` is removed — use `eslint .`. No tests, no CI. `package-lock.json` only — use `npm`, not yarn/pnpm/bun.
 
 ## Architecture
 
 ```
 src/
-  app/             # Next.js App Router
-    (public)/      # Route group — public site layout
-      (home)/      # Landing page (mostly empty shell)
-      songs/[slug] # Song detail page
-      artists/[slug] # Artist detail page
-      search/      # Combined song+artist search
-      about-us/, contact-us/, request/  # Static pages
+  app/
+    (public)/          # Public site: (home), songs[/slug], artists[/slug], search, favorites, blog[/slug], chords, about-us, contact-us, request, privacy, terms
     admin/
-      login/       # Admin login form
-      (protected)/ # Dashboard: artists CRUD, songs CRUD + add
+      login/           # Login form + useAdminLogin hook
+      (protected)/     # (dashboard) stats + artists CRUD, songs CRUD + add/edit/bulk, blog CRUD, data-health
   components/
-    ui/            # shadcn/ui primitives (new-york style)
-    layout/        # public/ and admin/ layout wrappers
+    ui/                # shadcn/ui (new-york) + custom: chord-diagram, chord-popover, confirm-dialog, breadcrumbs, json-ld, skeleton, sheet, table
+    layout/            # public/ and admin/ layouts, nav, cmdk-search (⌘K), scroll-provider (Lenis)
+    chord-sheet-renderer.tsx
   core/
-    supabase/client.ts   # Singleton supabase-js client (anon key, client-only)
-    provider/theme.provider.tsx  # @ecosy/next-themes + Toaster
-    constants/routes.ts  # Route constants (mostly empty)
+    supabase/client.ts   # Browser anon-key singleton (client components, Zustand stores)
+    supabase/server.ts   # createServerClient() + createAdminClient() (service-role) — server components
+    provider/theme.provider.tsx  # next-themes + Toaster
+    constants/routes.ts  # publicRoutes + adminRoutes
+    types.ts
   store/
-    api/           # Supabase query functions (song, artist, search)
-    *.store.ts     # Zustand stores wrapping API layer
+    api/                 # *.api.ts = client fetchers; *.server.ts = server fetchers
+    *.store.ts           # Zustand (song, artist, auth)
   lib/
-    utils.ts       # cn() via clsx + tailwind-merge
-    title-to-slug.ts
-  proxy.ts    # Cookie-based auth guard for /admin/* (Next.js 16 proxy)
+    chords.ts            # Transpose engine (see below)
+    parse-chord-content.ts, title-to-slug.ts, use-favorites.ts, is-new.ts, utils.ts (cn())
+  proxy.ts               # Cookie-based auth guard for /admin/*
 ```
 
 ## Key facts
 
-- **Auth**: Cookie-based. `supabase.auth.signInWithPassword()` sets `session` + `user` cookies via `cookies-next`. Proxy (`src/proxy.ts`) redirects unauthenticated requests from `/admin/*` to `/admin/login`, and redirects authenticated users away from `/admin/login` to `/admin/`.
-- **Supabase client**: Browser-side singleton (`createClient`). Anon key in `.env`, readable at runtime. **Do not put server-only queries in client code** — the app currently does everything client-side, including fetching data for server components.
-- **`@/*` = `./src/*`** (tsconfig paths).
-- **shadcn/ui**: new-york style, `components.json` at root. Add new primitives with `npx shadcn-ui@latest add <component>`. Existing: button, drawer, dropdown-menu, form, label, select, switch, toast.
-- **Theme**: Uses `next-themes`. Imports from `next-themes`. `<html>` has `suppressHydrationWarning`. ThemeProvider follows shadcn/ui pattern (`React.ComponentProps<typeof NextThemesProvider>`).
-- **Next.js 16 specifics**: Turbopack default bundler. `params`/`searchParams` are Promises (must `await`). `proxy.ts` replaces `middleware.ts` (Node.js runtime). `next lint` removed — use `eslint .` directly.
-- **Dynamic pages** use `export const revalidate = 0` (no ISR — SSR on every request).
-- **Supabase local dev**: `supabase/migrations/` contains SQL migrations. Push with `supabase db push`. Schema managed via Supabase dashboard + migrations.
-- **No tests**, no CI. Typecheck via `npm run typecheck`.
-- **`package-lock.json` only** — use `npm`, not yarn/pnpm/bun.
+- **Hybrid fetching — NOT client-only anymore.** Public pages are server components that call `store/api/*.server.ts` (wrapped in `cache` + `unstable_cache` with 60–300s TTLs). Client `*.api.ts` (browser anon client) is still used by Zustand stores and admin mutations. Don't move a server fetcher into client code or vice versa without checking callers.
+- **Two Supabase clients.** `core/supabase/server.ts` exports `createServerClient()` (anon, no persistSession) and `createAdminClient()` (service-role key; throws if `SUPABASE_SERVICE_ROLE_KEY` unset). `createAdminClient` is currently unused — admin writes still go through the anon client + RLS.
+- **Search quirk**: `app/(public)/search/page.tsx` is a server component but imports `store/api/search.api.ts` (the client module) — it calls RPCs `search_songs` / `search_artists` (pg_trgm fuzzy) and works server-side too. Both `search-*` and admin/songs pages read `searchParams` (a Promise — must `await`).
+- **Caching**: public pages use ISR `revalidate` (home/songs 60, artists 300, blog 300, chords 86400) + `generateStaticParams` on `songs/[slug]` and `artists/[slug]`. Only admin pages and `search` use `revalidate = 0`.
+- **Auth**: `signInWithPassword()` sets `session` + `user` cookies via `cookies-next`. `proxy.ts` only checks cookie **presence** — no server-side session validation. Unauthenticated `/admin/*` → `/admin/login`; logged-in users on `/admin/login` → `/admin/`.
+- **Env vars** (see `.env.example`, typed in `src/env.d.ts`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_STORAGE_BASE_URL`, `NEXT_PUBLIC_SHARE_BASE_URL`. Footgun: `server.ts` falls back to `NEXT_PUBLIC_SERVICE_ROLE_KEY` for the service-role client — a `NEXT_PUBLIC_`-prefixed service key would be exposed in the browser bundle. Keep it non-public.
+- **Images**: `next.config.mjs` whitelists `cdn-images.dzcdn.net` and `upload.wikimedia.org` via `remotePatterns`. New external image hosts must be added there or `next/image` fails.
+- **`@/*` = `./src/*`**. Theme: `next-themes`, `<html suppressHydrationWarning>`, ThemeProvider wraps `<Toaster />`.
+- **shadcn/ui**: new-york style, `components.json` at root, `cssVariables: false`. Add primitives with `npx shadcn@latest add <name>`. Existing primitives are spread across flat files and subfolders (`button/`, `drawer/`, `dropdown/`, `form/`, `switch/`, `toast/`).
+- **`supabase/migrations/`** holds SQL schema + seed data. Apply with `supabase db push` (project already linked — `.temp/project-ref`). Schema changes go through migrations, not the dashboard.
 
 ## Song metadata
 
-`song` table has 6 additional fields beyond the core CRUD columns:
+`song` table has 6 additional fields beyond core CRUD columns (migration `20250712000000_song_metadata.sql`):
 
 | Column | Type | Default | Description |
 |---|---|---|---|
@@ -72,29 +71,29 @@ src/
 | `genre` | TEXT | null | Genre tag (Rock, Pop, Blues...) |
 | `isActive` | BOOLEAN | true | Soft-delete toggle for songs |
 
-**Chord features**: Song detail page has transpose buttons (+/- semitones) that
-parse chords from raw HTML and shift them. Auto-scroll has variable speed
-controls (0.8x, 1.5x, 3x, 5x). Both features are client-side only.
+## Chord features (client-side only)
 
-**Admin CRUD**: Full create/read/update/delete for songs and artists.
-- Song edit at `/admin/songs/[id]/edit` using shared SongForm component
-- Artist edit/delete in the list view with drawer form
-- Active/inactive toggles for both entities
-- RLS policies allow authenticated INSERT/UPDATE/DELETE
+- **Transpose** lives in `src/lib/chords.ts`: `CHORD_REGEX`, `transposeChordToken()`, `wrapChords()` (wraps chords in `<span class="chord-pop" data-chord="...">`). Slash chords, `#`/`b` roots, sharp vs flat display per song key. `song/[slug]/components/detail.tsx` applies it with a transpose state; concert-pitch mode adds capo to the offset.
+- **Auto-scroll** speeds `[0.8, 1.5, 3, 5]` (framer-motion scroll animation).
+- **Chord diagrams** (`components/ui/chord-diagram.tsx`) + hover popovers; dynamically imported, `ssr: false`.
+- **Favorites** are localStorage-only (`src/lib/use-favorites.ts`, key `guitar-chords-favorites`), no DB.
+- **Page views**: `analytics.api.ts` inserts into `page_view` from the client; `page_view` also feeds trending + admin dashboard stats.
 
-**Public filtering**: Public pages use `fetchActiveSongs()` and
-`fetchActiveArtistsWithSongCount()` — only `isActive = true` records.
-Admin pages use `fetchSongs()` / `fetchArtists()` — all records.
+## Admin CRUD
 
-## Route conventions
+- Songs: list/search (server-side, `searchSongsAdmin`), add (`songs/add`), edit (`songs/[id]/edit`, shared SongForm), bulk import/delete/activate (`songs/bulk`, `bulkUpdateSongs`/`bulkDeleteSongs`).
+- Artists: drawer form + list view; active/inactive toggles for both entities.
+- RLS allows authenticated INSERT/UPDATE/DELETE; admin pages render server-side with `revalidate = 0`.
 
-- Route groups `(public)` and `(protected)` for layout scoping.
-- `[slug]` dynamic routes for song/artist detail pages.
-- Admin pages mirror public structure under `admin/(protected)/`.
-- Component colocation: each page directory has `components/` subfolder.
-- `loading.tsx` skeletons exist for all dynamic routes (songs, artists, search, song/artist detail, home).
-- `not-found.tsx` (404) and `error.tsx` (error boundary) at app root with branded design.
-- `robots.ts` and `sitemap.ts` (dynamic) generate SEO metadata at build/request time.
+## Public vs admin fetching
+
+- Public: server fetchers filter `isActive = true` (songs and their artists). `artist_with_song_count` DB view backs artist counts.
+- Admin: `searchSongsAdmin`/`searchArtistsAdmin` return all records regardless of `isActive`.
+
+## Docs
+
+- `docs/SCALE-PLAN.md` and `docs/PERFORMANCE.md` are **mostly implemented** (perf indexes, home RPCs `get_home_stats`/`get_top_songs`/`get_dashboard_stats`, server-side pagination, `artist_with_song_count` view, ⌘K search, bulk actions, ISR revalidates, dynamic imports). Re-read before planning work they describe — don't re-implement.
+- RPCs to reuse: `search_songs`, `search_artists` (fuzzy), `get_home_stats`, `get_dashboard_stats`, `get_top_songs`.
 
 ## Shorthands
 
@@ -104,21 +103,6 @@ Admin pages use `fetchSongs()` / `fetchArtists()` — all records.
 | build | `npm run build` (Turbopack default, add `--webpack` to opt out) |
 | lint | `npm run lint` |
 | typecheck | `npm run typecheck` |
-| add shadcn/ui component | `npx shadcn-ui@latest add <name>` |
+| add shadcn/ui component | `npx shadcn@latest add <name>` |
+| push DB migrations | `supabase db push` |
 | Next.js upgrade codemod | `npx @next/codemod@latest next-16` |
-
-## Scale plan
-
-`docs/SCALE-PLAN.md` — phased performance & UX plan for 1000s of songs/artists.
-Start with Phase 0 (DB indexes in a new migration), then Phase 1 (home page
-lightweight RPCs), etc.
-
-## Project Skills
-
-Skills defined in `.opencode/skills/<name>/SKILL.md`. Restart opencode after editing.
-
-| Skill | Purpose |
-|---|---|
-| `ponytail` | Modern clean code style: TypeScript, React, Tailwind, imports, component patterns |
-| `ui` | Design system: color palette, typography, cards, buttons, dark mode, spacing, icons |
-| `caveman` | Project-level caveman communication mode (extends global caveman skill) |

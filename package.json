@@ -19,6 +19,7 @@
     "@radix-ui/react-switch": "^1.2.0",
     "@radix-ui/react-toast": "^1.2.0",
     "@supabase/supabase-js": "^2.110.2",
+    "@tombatossals/chords-db": "^0.5.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookies-next": "^6.1.1",

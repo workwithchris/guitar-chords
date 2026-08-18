@@ -1,4 +1,5 @@
 import React from 'react'
+import guitarChords from '@tombatossals/chords-db/lib/guitar.json'
 
 type FretPosition = {
   string: number
@@ -13,75 +14,63 @@ type ChordShape = {
   baseFret?: number
 }
 
-const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
-
-const STRING_OPEN_PITCH = [4, 9, 2, 11, 6, 4]
-
-const CHORD_INTERVALS: Record<string, number[]> = {
-  maj: [0, 4, 7],
-  '': [0, 4, 7],
-  m: [0, 3, 7],
-  min: [0, 3, 7],
-  dim: [0, 3, 6],
-  aug: [0, 4, 8],
-  sus2: [0, 2, 7],
-  sus4: [0, 5, 7],
-  '7': [0, 4, 7, 10],
-  maj7: [0, 4, 7, 11],
-  M7: [0, 4, 7, 11],
-  m7: [0, 3, 7, 10],
-  min7: [0, 3, 7, 10],
-  dim7: [0, 3, 6, 9],
-  m7b5: [0, 3, 6, 10],
-  'm7-5': [0, 3, 6, 10],
-  '6': [0, 4, 7, 9],
-  m6: [0, 3, 7, 9],
-  '9': [0, 4, 7, 10, 2],
-  maj9: [0, 4, 7, 11, 2],
-  m9: [0, 3, 7, 10, 2],
-  'add9': [0, 4, 7, 2],
-  'add2': [0, 4, 7, 2],
-  madd9: [0, 3, 7, 2],
-  '11': [0, 4, 7, 10, 2, 5],
-  '13': [0, 4, 7, 10, 2, 5, 9],
-  '5': [0, 7],
-  power: [0, 7],
+type DbPosition = {
+  frets: number[]
+  fingers?: number[]
+  baseFret?: number
+  barres?: number[]
+  capo?: boolean
 }
 
-const OPEN_SHAPES: Record<string, ChordShape> = {
-  C: { name: 'C', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 1, finger: 1 }, { string: 3, fret: 0 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 3, finger: 3 }, { string: 6, fret: -1 }] },
-  G: { name: 'G', positions: [{ string: 1, fret: 3, finger: 3 }, { string: 2, fret: 0 }, { string: 3, fret: 0 }, { string: 4, fret: 0 }, { string: 5, fret: 2, finger: 1 }, { string: 6, fret: 3, finger: 4 }] },
-  D: { name: 'D', positions: [{ string: 1, fret: 2, finger: 2 }, { string: 2, fret: 3, finger: 3 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 0 }, { string: 5, fret: -1 }, { string: 6, fret: -1 }] },
-  A: { name: 'A', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 2, finger: 2 }, { string: 3, fret: 2, finger: 3 }, { string: 4, fret: 2, finger: 1 }, { string: 5, fret: 0 }, { string: 6, fret: -1 }] },
-  E: { name: 'E', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 1, finger: 1 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 2, finger: 3 }, { string: 6, fret: 0 }] },
-  Am: { name: 'Am', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 1, finger: 1 }, { string: 3, fret: 2, finger: 2 }, { string: 4, fret: 2, finger: 3 }, { string: 5, fret: 0 }, { string: 6, fret: -1 }] },
-  Em: { name: 'Em', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 0 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 2, finger: 3 }, { string: 6, fret: 0 }] },
-  Dm: { name: 'Dm', positions: [{ string: 1, fret: 1, finger: 1 }, { string: 2, fret: 3, finger: 3 }, { string: 3, fret: 2, finger: 2 }, { string: 4, fret: 0 }, { string: 5, fret: -1 }, { string: 6, fret: -1 }] },
-  D7: { name: 'D7', positions: [{ string: 1, fret: 2, finger: 2 }, { string: 2, fret: 1, finger: 1 }, { string: 3, fret: 2, finger: 3 }, { string: 4, fret: 0 }, { string: 5, fret: -1 }, { string: 6, fret: -1 }] },
-  G7: { name: 'G7', positions: [{ string: 1, fret: 1, finger: 1 }, { string: 2, fret: 0 }, { string: 3, fret: 0 }, { string: 4, fret: 0 }, { string: 5, fret: 2, finger: 2 }, { string: 6, fret: 3, finger: 3 }] },
-  C7: { name: 'C7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 1, finger: 1 }, { string: 3, fret: 3, finger: 3 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 3, finger: 4 }, { string: 6, fret: -1 }] },
-  A7: { name: 'A7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 2, finger: 2 }, { string: 3, fret: 0 }, { string: 4, fret: 2, finger: 1 }, { string: 5, fret: 0 }, { string: 6, fret: -1 }] },
-  E7: { name: 'E7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 1, finger: 1 }, { string: 4, fret: 0 }, { string: 5, fret: 2, finger: 2 }, { string: 6, fret: 0 }] },
-  Cmaj7: { name: 'Cmaj7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 0 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 3, finger: 3 }, { string: 6, fret: -1 }] },
-  Dm7: { name: 'Dm7', positions: [{ string: 1, fret: 1, finger: 1 }, { string: 2, fret: 1, finger: 1 }, { string: 3, fret: 2, finger: 2 }, { string: 4, fret: 0 }, { string: 5, fret: -1 }, { string: 6, fret: -1 }], barre: { fret: 1, fromString: 1, toString: 2 } },
-  Em7: { name: 'Em7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 0 }, { string: 4, fret: 0 }, { string: 5, fret: 2, finger: 2 }, { string: 6, fret: 0 }] },
-  Am7: { name: 'Am7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 1, finger: 1 }, { string: 3, fret: 0 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 0 }, { string: 6, fret: -1 }] },
-  Fmaj7: { name: 'Fmaj7', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 3, finger: 2 }, { string: 5, fret: 3, finger: 3 }, { string: 6, fret: -1 }] },
-  Cadd9: { name: 'Cadd9', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 3, finger: 3 }, { string: 3, fret: 0 }, { string: 4, fret: 2, finger: 1 }, { string: 5, fret: 3, finger: 2 }, { string: 6, fret: -1 }] },
-  Dsus2: { name: 'Dsus2', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 3, finger: 3 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 0 }, { string: 5, fret: -1 }, { string: 6, fret: -1 }] },
-  Dsus4: { name: 'Dsus4', positions: [{ string: 1, fret: 3, finger: 3 }, { string: 2, fret: 3, finger: 4 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 0 }, { string: 5, fret: -1 }, { string: 6, fret: -1 }] },
-  Asus4: { name: 'Asus4', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 3, finger: 3 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 0 }, { string: 6, fret: -1 }] },
-  Asus2: { name: 'Asus2', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 2, finger: 2 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 0 }, { string: 5, fret: 0 }, { string: 6, fret: -1 }] },
-  Esus4: { name: 'Esus4', positions: [{ string: 1, fret: 0 }, { string: 2, fret: 0 }, { string: 3, fret: 2, finger: 1 }, { string: 4, fret: 2, finger: 2 }, { string: 5, fret: 2, finger: 3 }, { string: 6, fret: 0 }] },
+type DbEntry = { key: string; suffix: string; positions: DbPosition[] }
+
+const CHORDS = (guitarChords as { chords: Record<string, DbEntry[]> }).chords
+
+// chords-db root keys (uses sharps for C#/F#, flats for Eb/Ab/Bb)
+const DB_KEYS = ['C', 'Csharp', 'D', 'Eb', 'E', 'F', 'Fsharp', 'G', 'Ab', 'A', 'Bb', 'B']
+
+// our chord quality tokens -> chords-db suffix names
+const QUALITY_TO_SUFFIX: Record<string, string> = {
+  '': 'major',
+  maj: 'major',
+  M: 'major',
+  m: 'minor',
+  min: 'minor',
+  dim: 'dim',
+  aug: 'aug',
+  sus: 'sus4',
+  sus2: 'sus2',
+  sus4: 'sus4',
+  '7': '7',
+  maj7: 'maj7',
+  M7: 'maj7',
+  m7: 'm7',
+  min7: 'm7',
+  dim7: 'dim7',
+  'm7b5': 'm7b5',
+  'm7-5': 'm7b5',
+  '6': '6',
+  m6: 'm6',
+  '9': '9',
+  maj9: 'maj9',
+  m9: 'm9',
+  add9: 'add9',
+  add2: 'add9',
+  madd9: 'madd9',
+  '11': '11',
+  '13': '13',
 }
 
 function noteToPitch(name: string): number {
-  const map: Record<string, number> = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 }
+  const map: Record<string, number> = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, 'E#': 5, F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11, Cb: 11, 'B#': 0 }
   return map[name] ?? -1
 }
 
-export function parseChord(raw: string): { root: string; quality: string; bass: string; intervals: number[]; rootPitch: number } | null {
+function mod12(n: number): number {
+  return ((n % 12) + 12) % 12
+}
+
+export function parseChord(raw: string): { root: string; quality: string; bass: string } | null {
   const m = raw.match(/^([A-G])(#|b)?(.*)$/)
   if (!m) return null
   const root = m[1] + (m[2] ?? '')
@@ -94,123 +83,97 @@ export function parseChord(raw: string): { root: string; quality: string; bass: 
     if (bassMatch) bass = bassMatch[1] + (bassMatch[2] ?? '')
     rest = rest.slice(0, slashIdx)
   }
-  const qualityKey = rest.replace(/maj7$/, 'maj7').replace(/maj9$/, 'maj9').replace(/M7$/, 'maj7').replace(/maj/, 'maj').trim() || ''
-  let intervals = CHORD_INTERVALS[qualityKey]
-  if (!intervals) {
-    if (qualityKey.endsWith('7')) intervals = CHORD_INTERVALS['7']
-    else if (qualityKey.endsWith('9')) intervals = CHORD_INTERVALS['9']
-    else if (qualityKey.endsWith('sus2')) intervals = CHORD_INTERVALS['sus2']
-    else if (qualityKey.endsWith('sus4')) intervals = CHORD_INTERVALS['sus4']
-    else if (qualityKey.endsWith('add9') || qualityKey.endsWith('add2')) intervals = CHORD_INTERVALS['add9']
-    else if (qualityKey.endsWith('dim')) intervals = CHORD_INTERVALS['dim']
-    else if (qualityKey.endsWith('aug')) intervals = CHORD_INTERVALS['aug']
-    else intervals = CHORD_INTERVALS['']
-  }
-  return { root, quality: qualityKey, bass, intervals, rootPitch: noteToPitch(root) }
+  return { root, quality: rest.trim() || '', bass }
 }
 
-function mod12(n: number): number {
-  return ((n % 12) + 12) % 12
-}
-
-function generateVoicing(rootPitch: number, intervals: number[], bassPitch?: number): ChordShape | null {
-  const needed = new Set(intervals.map((i) => mod12(rootPitch + i)))
-  const targetBass = bassPitch !== undefined && bassPitch >= 0 ? mod12(bassPitch) : mod12(rootPitch)
-
-  const MAX_FRET = 12
-  const MAX_FINGERS = 4
-  const MAX_SPAN = 4
-
-  const stringsByIndex = [1, 2, 3, 4, 5, 6]
-
-  type Candidate = { string: number; fret: number; pitch: number }
-  const candidatesPerString: Candidate[][] = stringsByIndex.map((s, idx) => {
-    const open = STRING_OPEN_PITCH[idx]
-    const list: Candidate[] = [{ string: s, fret: -1, pitch: -1 }]
-    if (needed.has(mod12(open))) list.push({ string: s, fret: 0, pitch: mod12(open) })
-    for (let f = 1; f <= MAX_FRET; f++) {
-      const p = mod12(open + f)
-      if (needed.has(p)) list.push({ string: s, fret: f, pitch: p })
-    }
-    return list
-  })
-
-  const best: { current: { positions: FretPosition[]; score: number } | null } = { current: null }
-
-  const dfs = (idx: number, positions: FretPosition[], covered: Set<number>, mutedCount: number, frettedCount: number) => {
-    if (mutedCount > 2) return
-    if (idx === candidatesPerString.length) {
-      if (covered.size < needed.size) return
-      const fretted = positions.filter((p) => p.fret > 0)
-      if (fretted.length === 0) return
-      if (fretted.length > MAX_FINGERS) return
-      const frets = fretted.map((p) => p.fret)
-      const span = Math.max(...frets) - Math.min(...frets)
-      if (Math.min(...frets) > 0 && span > MAX_SPAN) return
-      let score = 0
-      score -= mutedCount * 8
-      score -= frettedCount * 2
-      score -= Math.min(...frets) > 0 ? Math.min(...frets) * 1 : 0
-      const lowest = [...positions].sort((a, b) => a.string - b.string).find((p) => p.fret !== -1)
-      if (lowest && mod12(STRING_OPEN_PITCH[6 - lowest.string] + Math.max(lowest.fret, 0)) === targetBass) score += 5
-      if (!best.current || score > best.current.score) {
-        best.current = { positions: positions.slice(), score }
-      }
-      return
-    }
-    for (const cand of candidatesPerString[idx]) {
-      const nextCovered = new Set(covered)
-      if (cand.pitch >= 0) nextCovered.add(cand.pitch)
-      const nextMuted = cand.fret === -1 ? mutedCount + 1 : mutedCount
-      const nextFretted = cand.fret > 0 ? frettedCount + 1 : frettedCount
-      if (nextFretted > MAX_FINGERS) continue
-      positions.push({ string: cand.string, fret: cand.fret })
-      dfs(idx + 1, positions, nextCovered, nextMuted, nextFretted)
-      positions.pop()
+// Power chords (root + 5th) are movable shapes not in chords-db — build directly.
+function powerShape(root: string): ChordShape | null {
+  const pitch = noteToPitch(root)
+  if (pitch < 0) return null
+  const eFret = mod12(pitch - 4) // root on low E string
+  if (eFret <= 3) {
+    return {
+      name: `${root}5`,
+      positions: [
+        { string: 6, fret: eFret, finger: eFret > 0 ? 1 : undefined },
+        { string: 5, fret: eFret + 2, finger: eFret > 0 ? 3 : undefined },
+        { string: 4, fret: eFret + 2, finger: eFret > 0 ? 4 : undefined },
+        { string: 3, fret: -1 },
+        { string: 2, fret: -1 },
+        { string: 1, fret: -1 },
+      ],
+      baseFret: eFret === 0 ? 1 : eFret,
     }
   }
-
-  dfs(0, [], new Set(), 0, 0)
-  if (!best.current || best.current.positions.length === 0) return null
-  const finalPositions = best.current.positions
-
-  const fretted = finalPositions.filter((p) => p.fret > 0)
-  const minFret = fretted.length ? Math.min(...fretted.map((p) => p.fret)) : 0
-  const maxFret = fretted.length ? Math.max(...fretted.map((p) => p.fret)) : 0
-
-  let barre: ChordShape['barre'] | undefined
-  if (minFret > 0 && maxFret > minFret) {
-    const barreStrings = finalPositions.filter((p) => p.fret === minFret)
-    if (barreStrings.length >= 2) {
-      const strNums = barreStrings.map((s) => s.string)
-      barre = { fret: minFret, fromString: Math.min(...strNums), toString: Math.max(...strNums) }
-    }
-  }
-
+  const aFret = mod12(pitch - 9) // root on A string
   return {
-    name: '',
-    positions: finalPositions,
-    barre,
-    baseFret: minFret > 1 ? minFret : 1,
+    name: `${root}5`,
+    positions: [
+      { string: 6, fret: -1 },
+      { string: 5, fret: aFret, finger: 1 },
+      { string: 4, fret: aFret + 2, finger: 3 },
+      { string: 3, fret: aFret + 2, finger: 4 },
+      { string: 2, fret: -1 },
+      { string: 1, fret: -1 },
+    ],
+    baseFret: aFret,
   }
 }
 
-export function getChordShape(name: string, capo = 0): ChordShape | null {
+export function getChordShape(name: string): ChordShape | null {
   const trimmed = name.trim()
   const parsed = parseChord(trimmed)
   if (!parsed) return null
 
-  if (parsed.bass === '') {
-    const cached = OPEN_SHAPES[trimmed]
-    if (cached) return cached
+  if (parsed.quality === '5' || parsed.quality === 'power') return powerShape(parsed.root)
+
+  const pitch = noteToPitch(parsed.root)
+  if (pitch < 0) return null
+  const dbKey = DB_KEYS[pitch]
+  const suffix = QUALITY_TO_SUFFIX[parsed.quality] ?? parsed.quality
+  const rootShapes = CHORDS[dbKey]
+  if (!rootShapes) return null
+  const entry =
+    rootShapes.find((e) => e.suffix === suffix) ??
+    rootShapes.find((e) => e.suffix === 'major')
+  if (!entry || entry.positions.length === 0) return null
+
+  // chords-db orders positions by popularity — first is the standard shape.
+  const pick = entry.positions[0]
+  if (!pick || pick.frets.length !== 6) return null
+
+  // frets/fingers index 0 = low E (string 6), 5 = high E (string 1).
+  // chords-db frets are relative to baseFret (when > 1) — normalize to
+  // absolute fret numbers so the renderer can treat them uniformly.
+  const base = pick.baseFret ?? 1
+  const toAbsolute = (f: number) => (f <= 0 ? f : base + f - 1)
+  const positions: FretPosition[] = pick.frets.map((f, i) => {
+    const finger = pick.fingers?.[i]
+    return {
+      string: 6 - i,
+      fret: toAbsolute(f),
+      finger: finger && finger > 0 ? finger : undefined,
+    }
+  })
+
+  const shape: ChordShape = {
+    name: trimmed,
+    positions,
+    baseFret: base,
   }
 
-  const rootPitch = parsed.rootPitch
-  const bassPitch = parsed.bass ? noteToPitch(parsed.bass) : -1
-  const voicing = generateVoicing(rootPitch, parsed.intervals, bassPitch)
-  if (!voicing) return null
-  voicing.name = trimmed
-  return voicing
+  const barres = pick.barres ?? []
+  if (barres.length) {
+    const bf = toAbsolute(barres[0])
+    const strNums = positions
+      .filter((p) => p.fret === bf)
+      .map((p) => p.string)
+    if (strNums.length >= 2) {
+      shape.barre = { fret: bf, fromString: Math.min(...strNums), toString: Math.max(...strNums) }
+    }
+  }
+
+  return shape
 }
 
 const FRET_COUNT = 5
@@ -228,7 +191,7 @@ export interface ChordDiagramProps {
 }
 
 export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = true }: ChordDiagramProps) {
-  const shape = getChordShape(chord, capo)
+  const shape = getChordShape(chord)
   if (!shape) return null
 
   const scale = size / DIAGRAM_WIDTH
