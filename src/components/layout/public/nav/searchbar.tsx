@@ -29,7 +29,7 @@ export default function SearchBar() {
                 className='pl-9 h-9 w-36 md:w-48 text-sm rounded-lg'
                 {...register("search")}
             />
-            <button type="submit" className='absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors'>
+            <button type="submit" className='absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground transition-colors'>
                 <Search className="h-4 w-4" />
             </button>
         </form>

@@ -202,7 +202,7 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
 
   return (
     <div className="inline-flex flex-col items-center gap-1">
-      <svg viewBox={`0 0 ${DIAGRAM_WIDTH} ${DIAGRAM_HEIGHT}`} width={svgW} height={svgH} className="text-neutral-700 dark:text-neutral-300">
+      <svg viewBox={`0 0 ${DIAGRAM_WIDTH} ${DIAGRAM_HEIGHT}`} width={svgW} height={svgH} className="text-foreground">
         <g transform={`scale(${scale})`}>
           {baseFret === 1 && (
             <rect x={PADDING - 2} y={PADDING} width={STRING_SPACING * 4 + 4} height={3} rx={1} fill="currentColor" />
@@ -214,11 +214,11 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
               width={STRING_SPACING * 5 + 8}
               height={5}
               rx={2.5}
-              className="fill-neutral-500 dark:fill-neutral-400"
+              className="fill-muted-foreground"
             />
           )}
           {baseFret > 1 && (
-            <text x={4} y={PADDING + FRET_SPACING / 2} fontSize={9} fontWeight={600} className="fill-neutral-500 dark:fill-neutral-400">
+            <text x={4} y={PADDING + FRET_SPACING / 2} fontSize={9} fontWeight={600} className="fill-muted-foreground">
               {baseFret}fr
             </text>
           )}
@@ -256,7 +256,7 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
               width={(shape.barre.toString - shape.barre.fromString) * STRING_SPACING + 14}
               height={14}
               rx={7}
-              className="fill-neutral-900 dark:fill-neutral-100"
+              className="fill-foreground"
             />
           )}
 
@@ -281,9 +281,9 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
 
             return (
               <g key={`pos-${pos.string}`}>
-                <circle cx={cx} cy={cy} r={7} className="fill-neutral-900 dark:fill-neutral-100" />
+                <circle cx={cx} cy={cy} r={7} className="fill-foreground" />
                 {pos.finger && (
-                  <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" className="fill-neutral-50 dark:fill-neutral-900" fontSize={9} fontWeight={600}>
+                  <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" className="fill-background" fontSize={9} fontWeight={600}>
                     {pos.finger}
                   </text>
                 )}
@@ -293,7 +293,7 @@ export default function ChordDiagram({ chord, size = 120, capo = 0, showLabel = 
         </g>
       </svg>
       {showLabel && (
-        <span className="text-xs font-bold font-mono text-neutral-600 dark:text-neutral-400">{shape.name}</span>
+        <span className="text-xs font-bold font-mono text-muted-foreground">{shape.name}</span>
       )}
     </div>
   )

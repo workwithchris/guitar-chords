@@ -6,7 +6,7 @@ export default function BulkImportPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">Bulk Import Songs</h1>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                     Paste multiple songs at once. One song per line, tab-separated fields.
                 </p>
             </div>

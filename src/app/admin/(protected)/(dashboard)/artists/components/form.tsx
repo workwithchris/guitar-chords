@@ -78,8 +78,8 @@ export default function AddArtistForm() {
             <Card>
                 <CardContent className="p-6 space-y-4">
                     <div className="flex items-center gap-2 pb-2">
-                        <User className="h-4 w-4 text-neutral-500" />
-                        <h3 className="text-sm font-semibold tracking-wide text-neutral-500 uppercase">Artist Details</h3>
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">Artist Details</h3>
                     </div>
                     <Separator />
                     <div className="grid grid-cols-2 gap-6">
@@ -100,8 +100,8 @@ export default function AddArtistForm() {
                             <div className="space-y-2">
                                 <Label>Image</Label>
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shrink-0">
-                                        <ImageIcon className="h-4 w-4 text-neutral-400" />
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background dark:bg-secondary shrink-0">
+                                        <ImageIcon className="h-4 w-4 text-muted-foreground" />
                                     </div>
                                     <Input name="image" type="file" onChange={(e) => {
                                         if (e.target.files?.[0]) {

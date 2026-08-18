@@ -74,7 +74,7 @@ export default function BulkImportForm() {
         <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
             <Card>
                 <CardContent className="p-6 space-y-4">
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900 text-xs text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-background dark:bg-secondary text-xs text-muted-foreground">
                         <FileText className="h-4 w-4 mt-0.5 shrink-0" />
                         <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{FORMAT_HINT}</pre>
                     </div>
@@ -101,7 +101,7 @@ export default function BulkImportForm() {
             {results && (
                 <Card>
                     <CardContent className="p-6 space-y-3">
-                        <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Import Results</h3>
+                        <h3 className="font-semibold text-foreground">Import Results</h3>
                         <div className="flex gap-4 text-sm">
                             <span className="inline-flex items-center gap-1.5 text-emerald-600">
                                 <CheckCircle className="h-4 w-4" />
@@ -122,9 +122,9 @@ export default function BulkImportForm() {
                             </div>
                         )}
                         {results.failed === 0 && (
-                            <p className="text-xs text-neutral-500">
+                            <p className="text-xs text-muted-foreground">
                                 All songs imported successfully!{' '}
-                                <button type="button" onClick={() => router.push('/admin/songs')} className="underline hover:text-neutral-900 dark:hover:text-neutral-100">
+                                <button type="button" onClick={() => router.push('/admin/songs')} className="underline hover:text-foreground">
                                     View songs
                                 </button>
                             </p>

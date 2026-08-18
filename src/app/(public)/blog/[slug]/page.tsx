@@ -70,17 +70,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <article className="max-w-2xl mx-auto space-y-8">
                 <Link
                     href="/blog"
-                    className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Back to blog
                 </Link>
 
                 <div className="space-y-4">
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                         {post.title}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                         {post.authorName && (
                             <span className="inline-flex items-center gap-1.5">
                                 <User className="h-3.5 w-3.5" />
@@ -109,10 +109,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
-                <div className="border-t border-neutral-200 dark:border-neutral-800 pt-8">
+                <div className="border-t border-border pt-8">
                     <Link
                         href="/blog"
-                        className="inline-flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ArrowLeft className="h-3.5 w-3.5" />
                         Back to blog

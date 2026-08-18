@@ -17,14 +17,14 @@ const DashboardCard = ({
             <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                        <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{title}</p>
+                        <p className="text-sm font-medium text-muted-foreground">{title}</p>
                         <p className="text-3xl font-bold tracking-tight">{value ?? 0}</p>
                         {subtitle && (
-                            <p className="text-xs text-neutral-400 dark:text-neutral-500">{subtitle}</p>
+                            <p className="text-xs text-muted-foreground">{subtitle}</p>
                         )}
                     </div>
                     {icon && (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 group-hover:scale-110 transition-transform">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-muted-foreground group-hover:scale-110 transition-transform">
                             {icon}
                         </div>
                     )}

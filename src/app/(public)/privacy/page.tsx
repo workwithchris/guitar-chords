@@ -21,43 +21,43 @@ export default function PrivacyPage() {
     <div className="max-w-3xl mx-auto space-y-8 pb-16">
       <Breadcrumbs items={[{ label: 'Privacy Policy' }]} />
 
-      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+      <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
         Privacy Policy
       </h1>
 
-      <div className="prose prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed space-y-4 text-neutral-600 dark:text-neutral-400">
+      <div className="prose prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed space-y-4 text-muted-foreground">
         <p>Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Information We Collect</h2>
+        <h2 className="text-lg font-semibold text-foreground">Information We Collect</h2>
         <p>
           We collect minimal information to improve your experience. This includes anonymous page views
           (which songs you visit) to understand popular content. We do not require an account to browse
           or use the site.
         </p>
 
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Local Storage</h2>
+        <h2 className="text-lg font-semibold text-foreground">Local Storage</h2>
         <p>
           We use local storage in your browser to save your favorite songs. This data stays on your device
           and is not transmitted to our servers. You can clear this at any time via your browser settings.
         </p>
 
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Cookies</h2>
+        <h2 className="text-lg font-semibold text-foreground">Cookies</h2>
         <p>
           We use minimal cookies for essential functionality (theme preference, admin session).
           We do not use tracking cookies or third-party advertising cookies.
         </p>
 
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Data Sharing</h2>
+        <h2 className="text-lg font-semibold text-foreground">Data Sharing</h2>
         <p>
           We do not sell, trade, or share your personal information with third parties.
           Anonymous analytics data (page views) is stored in our database to help us understand
           which content is most valuable to our users.
         </p>
 
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Contact</h2>
+        <h2 className="text-lg font-semibold text-foreground">Contact</h2>
         <p>
           If you have questions about this privacy policy, please contact us through our{' '}
-          <a href="/contact-us" className="text-neutral-900 dark:text-neutral-100 underline underline-offset-2 hover:no-underline">
+          <a href="/contact-us" className="text-foreground underline underline-offset-2 hover:no-underline">
             contact page
           </a>.
         </p>

@@ -47,14 +47,14 @@ export default async function SongsPage({ searchParams }: { searchParams: Promis
             {prevPage && <link rel="prev" href={`${baseUrl}/songs?page=${prevPage}${difficulty ? `&difficulty=${difficulty}` : ''}${genre ? `&genre=${genre}` : ''}${key ? `&key=${key}` : ''}`} />}
             {nextPage && <link rel="next" href={`${baseUrl}/songs?page=${nextPage}${difficulty ? `&difficulty=${difficulty}` : ''}${genre ? `&genre=${genre}` : ''}${key ? `&key=${key}` : ''}`} />}
             <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                     All Songs
                 </h1>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                     {result.totalCount} {result.totalCount === 1 ? 'song' : 'songs'} in the collection
                 </p>
             </div>
-            <div className="border-t border-neutral-200 dark:border-neutral-800" />
+            <div className="border-t border-border" />
             <Suspense>
                 <SongsList
                     songs={result.data as any}

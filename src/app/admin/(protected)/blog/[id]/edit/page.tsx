@@ -21,7 +21,7 @@ export default async function EditBlogPostPage({ params }: { params: Promise<{ i
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">Edit Blog Post</h1>
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                <p className="mt-1 text-sm text-muted-foreground">
                     Update your blog post or lesson
                 </p>
             </div>

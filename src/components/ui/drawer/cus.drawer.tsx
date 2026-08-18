@@ -12,7 +12,7 @@ export default function CusDrawer({ title, children, show, handleOpen, handleClo
     return (
         <Drawer closeThreshold={2} open={show} onClose={handleClose}>
             <DrawerContent className='max-w-2xl mx-auto'>
-                <div className='flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 px-6 py-4'>
+                <div className='flex items-center justify-between border-b border-border px-6 py-4'>
                     <DrawerHeader className="p-0">
                         <DrawerTitle>{title}</DrawerTitle>
                         <DrawerDescription>Manage artist details</DrawerDescription>
